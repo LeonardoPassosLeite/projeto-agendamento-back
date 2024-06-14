@@ -79,7 +79,8 @@ namespace Agendamento.Domain.Entities
             DomainExceptionValidation.When(string.IsNullOrEmpty(Cidade), "Ciadade é obrigatório");
             DomainExceptionValidation.When(string.IsNullOrEmpty(Uf), "UF é obrigatório");
             DomainExceptionValidation.When(string.IsNullOrEmpty(Pais), "País é obrigatório");
-            DomainExceptionValidation.When(string.IsNullOrEmpty(Foto), "Foto é obrigatório");
+            DomainExceptionValidation.When(Foto?.Length > 250, "Foto excede o número de caracteres permitidos");
+
         }
     }
 }

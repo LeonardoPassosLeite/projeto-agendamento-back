@@ -1,4 +1,4 @@
-using Agendamento.Domain.Validation;
+using Agendamento.Domain.Exceptions;
 
 namespace Agendamento.Domain.Entities
 {
@@ -28,7 +28,7 @@ namespace Agendamento.Domain.Entities
 
         public Produto(int id, string nome, decimal preco, string descricao, string fotoPrincipal, List<string> fotos)
         {
-            DomainExceptionValidation.When(id < 0, "Valor de Id é inválido");
+            ValidationException.When(id < 0, "Valor de Id é inválido");
 
             Id = id;
             Nome = nome;
@@ -52,24 +52,24 @@ namespace Agendamento.Domain.Entities
             ValidaExcessoes();
         }
 
-        public void Deactivate()
+        public void Disable()
         {
             IsActive = false;
         }
 
         private void ValidaExcessoes()
         {
-            DomainExceptionValidation.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
-            DomainExceptionValidation.When(Nome.Length < 3, "Nome deve ter no mínimo 3 caracteres");
-            DomainExceptionValidation.When(Nome.Length > 100, "Nome deve ter no máximo 100 caracteres");
+            ValidationException.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
+            ValidationException.When(Nome.Length < 3, "Nome deve ter no mínimo 3 caracteres");
+            ValidationException.When(Nome.Length > 100, "Nome deve ter no máximo 100 caracteres");
 
-            DomainExceptionValidation.When(Preco < 0, "Valor de preço Inválido");
+            ValidationException.When(Preco < 0, "Valor de preço Inválido");
 
-            DomainExceptionValidation.When(Descricao.Length < 3, "Descrição deve ter no mínimo 3 caracteres");
-            DomainExceptionValidation.When(Descricao.Length > 100, "Descrição deve ter no máximo 100 caracteres");
+            ValidationException.When(Descricao.Length < 3, "Descrição deve ter no mínimo 3 caracteres");
+            ValidationException.When(Descricao.Length > 100, "Descrição deve ter no máximo 100 caracteres");
 
-            DomainExceptionValidation.When(FotoPrincipal?.Length > 250, "Foto principal excede o número de caracteres permitidos");
-            DomainExceptionValidation.When(Fotos?.Any(foto => foto.Length > 250) == true, "Uma ou mais fotos excedem o número de caracteres permitidos");
+            ValidationException.When(FotoPrincipal?.Length > 250, "Foto principal excede o número de caracteres permitidos");
+            ValidationException.When(Fotos?.Any(foto => foto.Length > 250) == true, "Uma ou mais fotos excedem o número de caracteres permitidos");
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Agendamento.Domain.Entities
             ValidaExcessoes(nome);
         }
 
-        public void Deactivate()
+        public void Disable()
         {
             DomainExceptionValidation.When(Produtos.Any(p => p.IsActive), "Não é possível desativar a categoria enquanto houver produtos ativos.");
             IsActive = false;

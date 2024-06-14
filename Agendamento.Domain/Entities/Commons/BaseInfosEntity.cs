@@ -10,6 +10,6 @@ namespace Agendamento.Domain.Entities
         public string Cidade { get; protected set; }
         public string Uf { get; protected set; }
         public string Pais { get; protected set; }
-        public string Foto { get; protected set; }
+        public string? Foto { get; protected set; }
     }
 }
