@@ -13,8 +13,8 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
 
             builder.HasData(
                 new Categoria(1, "Categoria 1"),
-                new Categoria(1, "Categoria 2"),
-                new Categoria(1, "Categoria 3")
+                new Categoria(2, "Categoria 2"),
+                new Categoria(3, "Categoria 3")
             );
         }
     }
