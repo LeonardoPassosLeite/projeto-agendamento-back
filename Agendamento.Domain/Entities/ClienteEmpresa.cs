@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Agendamento.Domain.Validation;
 
-namespace Agendamento.Domain.Enitiies
+namespace Agendamento.Domain.Entities
 {
     public sealed class ClienteEmpresa : BaseEntity
     {

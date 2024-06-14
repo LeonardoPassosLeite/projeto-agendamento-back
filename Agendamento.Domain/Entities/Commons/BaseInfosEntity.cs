@@ -1,4 +1,4 @@
-namespace Agendamento.Domain.Enitiies
+namespace Agendamento.Domain.Entities
 {
     public class BaseInfosEntity
     {
