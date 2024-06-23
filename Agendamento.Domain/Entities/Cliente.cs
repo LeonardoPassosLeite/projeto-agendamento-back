@@ -5,25 +5,14 @@ namespace Agendamento.Domain.Entities
 {
     public sealed class Cliente : BaseInfosEntity
     {
-        public string Cpf { get; private set; }
+        public string Cpf { get; private set; } = string.Empty;
         public int Idade { get; private set; }
 
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
         public Cliente(string nome, string telefone, string cpf, int idade, string cep, string endereco, string cidade, string uf, string pais, string foto)
         {
-            Nome = nome;
-            Telefone = telefone;
-            Cpf = cpf;
-            Idade = idade;
-            Cep = cep;
-            Endereco = endereco;
-            Cidade = cidade;
-            Uf = uf;
-            Pais = pais;
-            Foto = foto;
-
-            ValidaExcessoes();
+            IniciaValor(nome, telefone, cpf, idade, cep, endereco, cidade, uf, pais, foto);
         }
 
         public Cliente(int id, string nome, string telefone, string cpf, int idade, string cep, string endereco, string cidade, string uf, string pais, string foto)
@@ -31,21 +20,15 @@ namespace Agendamento.Domain.Entities
             ValidationException.When(id < 0, "Valor de Id é inválido");
 
             Id = id;
-            Nome = nome;
-            Telefone = telefone;
-            Cpf = cpf;
-            Idade = idade;
-            Cep = cep;
-            Endereco = endereco;
-            Cidade = cidade;
-            Uf = uf;
-            Pais = pais;
-            Foto = foto;
-
-            ValidaExcessoes();
+            IniciaValor(nome, telefone, cpf, idade, cep, endereco, cidade, uf, pais, foto);
         }
 
         public void Update(string nome, string telefone, string cpf, int idade, string cep, string endereco, string cidade, string uf, string pais, string foto)
+        {
+            IniciaValor(nome, telefone, cpf, idade, cep, endereco, cidade, uf, pais, foto);
+        }
+
+        private void IniciaValor(string nome, string telefone, string cpf, int idade, string cep, string endereco, string cidade, string uf, string pais, string foto)
         {
             Nome = nome;
             Telefone = telefone;
@@ -80,7 +63,6 @@ namespace Agendamento.Domain.Entities
             ValidationException.When(string.IsNullOrEmpty(Uf), "UF é obrigatório");
             ValidationException.When(string.IsNullOrEmpty(Pais), "País é obrigatório");
             ValidationException.When(Foto?.Length > 250, "Foto excede o número de caracteres permitidos");
-
         }
     }
 }

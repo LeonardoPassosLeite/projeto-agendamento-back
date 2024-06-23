@@ -9,7 +9,7 @@ namespace Agendamento.Domain.Entities
 
         public Categoria(string nome)
         {
-            ValidaExcessoes(nome);
+            IniciaValor(nome);
         }
 
         public Categoria(int id, string nome)
@@ -17,12 +17,12 @@ namespace Agendamento.Domain.Entities
             ValidationException.When(id < 0, "Id inválido");
 
             Id = id;
-            ValidaExcessoes(nome);
+            IniciaValor(nome);
         }
 
         public void Update(string nome)
         {
-            ValidaExcessoes(nome);
+            IniciaValor(nome);
         }
 
         public void Disable()
@@ -31,13 +31,18 @@ namespace Agendamento.Domain.Entities
             IsActive = false;
         }
 
-        private void ValidaExcessoes(string nome)
+        private void IniciaValor(string nome)
         {
-            ValidationException.When(string.IsNullOrEmpty(nome), "Nome é obrigatório");
-            ValidationException.When(nome.Length < 3, "O nome deve ter no mínimo 3 caracteres");
-            ValidationException.When(nome.Length > 100, "O nome deve ter no máximo 100 caracteres");
-
             Nome = nome;
+
+            ValidaExcessoes();
+        }
+
+        private void ValidaExcessoes()
+        {
+            ValidationException.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
+            ValidationException.When(Nome.Length < 3, "O nome deve ter no mínimo 3 caracteres");
+            ValidationException.When(Nome.Length > 100, "O nome deve ter no máximo 100 caracteres");
         }
     }
 }
