@@ -9,6 +9,8 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
         public void Configure(EntityTypeBuilder<Categoria> builder)
         {
             builder.HasKey(t => t.Id);
+            builder.Property(t => t.Id)
+               .ValueGeneratedOnAdd();
             builder.Property(p => p.Nome).HasMaxLength(100).IsRequired();
 
             builder.HasData(

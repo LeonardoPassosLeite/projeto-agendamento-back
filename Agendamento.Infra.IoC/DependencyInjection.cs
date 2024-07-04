@@ -1,3 +1,6 @@
+using Agendamento.Application.Interfaces;
+using Agendamento.Application.Mappings;
+using Agendamento.Application.Services;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
 using Agendamento.Infra.Data.Repositories;
@@ -9,7 +12,7 @@ namespace Agendamento.Infra.IoC
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrasctures(this IServiceCollection services,
+        public static IServiceCollection AddInfrastructures(this IServiceCollection services,
         IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -18,6 +21,10 @@ namespace Agendamento.Infra.IoC
 
             services.AddScoped<ICategoriaRepository, CategoriaRepository>();
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
+
+            services.AddScoped<ICategoriaService, CategoriaService>();
+            // services.AddScoped<IProdutoService, ProdutoService>();
+            services.AddAutoMapper(typeof(DoaminToDTOMappingProfile));
 
             return services;
         }

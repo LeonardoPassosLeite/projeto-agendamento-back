@@ -1,9 +1,12 @@
+using Agendamento.Application.DTOs.Commons;
+
 namespace Agendamento.Application.DTOs
 {
-    public class CategoriaDTO
+    public class CategoriaDTO : BaseDTO
     {
-        public int Id { get; set; }
-        public string Nome { get; set; }
         public bool IsActive { get; set; }
     }
+
+    public class UpdateCategoriaDTO : BaseDTO
+    { }
 }

@@ -1,13 +1,14 @@
+using Agendamento.Application.DTOs.Commons;
+using Microsoft.AspNetCore.Http;
+
 namespace Agendamento.Application.DTOs
 {
-    public class ProdutoDTO
+    public class ProdutoDTO : BaseDTO
     {
-        public int Id { get; set; }
-        public string Nome { get; set; }
         public decimal Preco { get; set; }
         public string Descricao { get; set; }
-        public string? FotoPrincipal { get; set; }
-        public List<string> Fotos { get; set; }
+        public IFormFile FotoPrincipal { get; set; }
+        public List<IFormFile> Fotos { get; set; } = new List<IFormFile>();
         public bool IsActive { get; set; } = true;
 
         public int CategoriaId { get; set; }

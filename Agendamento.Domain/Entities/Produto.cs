@@ -6,14 +6,12 @@ namespace Agendamento.Domain.Entities
     {
         public decimal Preco { get; private set; }
         public string Descricao { get; private set; }
-        public string? FotoPrincipal { get; private set; }
-        public List<string> Fotos { get; private set; }
+        public string? FotoPrincipal { get; set; }
+        public List<string> Fotos { get; set; } = new List<string>();
         public bool IsActive { get; set; } = true;
 
         public int CategoriaId { get; set; }
         public required Categoria Categoria { get; set; }
-        public int ClienteId { get; set; }
-        public Cliente? Cliente { get; set; }
 
         public Produto(string nome, decimal preco, string descricao, string fotoPrincipal, List<string> fotos)
         {
@@ -69,7 +67,10 @@ namespace Agendamento.Domain.Entities
             ValidationException.When(Descricao.Length > 100, "Descrição deve ter no máximo 100 caracteres");
 
             ValidationException.When(FotoPrincipal?.Length > 250, "Foto principal excede o número de caracteres permitidos");
-            ValidationException.When(Fotos?.Any(foto => foto.Length > 250) == true, "Uma ou mais fotos excedem o número de caracteres permitidos");
+            if (Fotos != null)
+            {
+                ValidationException.When(Fotos.Any(foto => foto.Length > 250), "Uma ou mais fotos excedem o número de caracteres permitidos");
+            }
         }
     }
 }

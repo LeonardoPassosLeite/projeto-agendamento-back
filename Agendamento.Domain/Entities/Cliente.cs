@@ -8,7 +8,6 @@ namespace Agendamento.Domain.Entities
         public string Cpf { get; private set; } = string.Empty;
         public int Idade { get; private set; }
 
-        public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
         public Cliente(string nome, string telefone, string cpf, int idade, string cep, string endereco, string cidade, string uf, string pais, string foto)
         {

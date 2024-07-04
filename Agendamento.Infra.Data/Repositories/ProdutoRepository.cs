@@ -65,28 +65,25 @@ namespace Agendamento.Infra.Data.Repositories
             return produto;
         }
 
-        public async Task<Produto> GetByCategoriaAsync(int? id)
+        public async Task<IEnumerable<Produto>> GetByCategoriaIdAsync(int categoriaId)
         {
-            if (id == null)
-                throw new ValidationException("Id não pode ser nulo.");
-
             try
             {
-                var produto = await _produtoContext.Produtos.Include(p => p.Categoria)
-                    .SingleOrDefaultAsync(p => p.Id == id);
+                var produtos = await _produtoContext.Produtos
+                    .Where(p => p.CategoriaId == categoriaId)
+                    .Include(p => p.Categoria)
+                    .ToListAsync();
 
-                if (produto == null)
-                    throw new NotFoundException($"Produto com Id {id} não encontrado.");
+                if (!produtos.Any())
+                {
+                    throw new NotFoundException($"Nenhum produto encontrado para a categoria com Id {categoriaId}.");
+                }
 
-                if (produto.Categoria == null)
-                    throw new NotFoundException($"Categoria para o Produto com Id {id} não encontrada.");
-
-
-                return produto;
+                return produtos;
             }
             catch (Exception ex)
             {
-                throw new DatabaseException("An error occurred while retrieving the product by category.", ex);
+                throw new DatabaseException("Um erro ocorreu ao buscar os produtos pela categoria.", ex);
             }
         }
 
@@ -105,11 +102,11 @@ namespace Agendamento.Infra.Data.Repositories
             }
             catch (DbUpdateException ex)
             {
-                throw new DatabaseException("An error occurred while updating the product.", ex);
+                throw new DatabaseException("Ocorreu um erro ao atualizar o produto.", ex);
             }
             catch (Exception ex)
             {
-                throw new DatabaseException("An unexpected error occurred while updating the product.", ex);
+                throw new DatabaseException("Ocorreu um erro inesperado ao atualizar o produto.", ex);
             }
         }
     }

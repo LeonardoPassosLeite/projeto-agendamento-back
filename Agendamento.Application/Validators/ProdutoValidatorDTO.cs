@@ -20,11 +20,11 @@ namespace Agendamento.Application.Validators
                 .MinimumLength(3).WithMessage("Descrição deve ter no mínimo 3 caracteres")
                 .MaximumLength(100).WithMessage("Descrição deve ter no máximo 100 caracteres");
 
-            RuleFor(x => x.FotoPrincipal)
-                .MaximumLength(250).WithMessage("Foto principal excede o número de caracteres permitidos");
+            // RuleFor(x => x.FotoPrincipal)
+            //     .MaximumLength(250).WithMessage("Foto principal excede o número de caracteres permitidos");
 
-            RuleForEach(x => x.Fotos)
-                .MaximumLength(250).WithMessage("Uma ou mais fotos excedem o número de caracteres permitidos");
+            // RuleForEach(x => x.Fotos)
+            //     .MaximumLength(250).WithMessage("Uma ou mais fotos excedem o número de caracteres permitidos");
         }
     }
 }

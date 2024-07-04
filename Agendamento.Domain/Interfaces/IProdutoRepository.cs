@@ -6,7 +6,7 @@ namespace Agendamento.Domain.Interfaces
     {
         Task<IEnumerable<Produto>> GetProdutosAsync();
         Task<Produto> GetByIdAsync(int? id);
-        Task<Produto> GetByCategoriaAsync(int? id);
+        Task<IEnumerable<Produto>> GetByCategoriaIdAsync(int categoriaId);
         Task<Produto> CreateAsync(Produto produto);
         Task<Produto> UpdateAsync(Produto produto);
         Task DisableAsync(Produto produto);
