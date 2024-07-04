@@ -1,13 +1,12 @@
-using System.Text;
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
+using Agendamento.Application.Validators;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Http;
 
 namespace Agendamento.Application.Services
 {
@@ -15,16 +14,16 @@ namespace Agendamento.Application.Services
     {
         private readonly IProdutoRepository _produtoRepository;
         private readonly IMapper _mapper;
-        private readonly IValidator<ProdutoActiveDTO> _validator;
+        private readonly IValidator<ProdutoDTO> _validator;
 
-        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoActiveDTO> validator)
+        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> validator)
         {
             _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
-            _mapper = mapper;
-            _validator = validator;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<ProdutoDTO> AddProdutoAsync(ProdutoActiveDTO produtoDto)
+        public async Task<ProdutoDTO> AddProdutoAsync(ProdutoDTO produtoDto)
         {
             if (produtoDto == null)
                 throw new ValidationException("Produto não pode ser nulo.");
@@ -44,23 +43,6 @@ namespace Agendamento.Application.Services
             {
                 throw new ApplicationException("Ocorreu um erro ao adicionar um produto", ex);
             }
-        }
-
-        private async Task<string> SaveFileAsync(IFormFile file)
-        {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            var filePath = Path.Combine(uploadsFolder, Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return filePath;
         }
 
         public async Task<IEnumerable<ProdutoDTO>> GetProdutosAsync()
@@ -110,6 +92,12 @@ namespace Agendamento.Application.Services
 
             if (produtoDto.Id <= 0)
                 throw new ValidationException("Id inválido.");
+
+            var validator = new ProdutoActiveDTOValidator();
+            ValidationResult validationResult = await validator.ValidateAsync(produtoDto);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
             try
             {

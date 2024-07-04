@@ -4,7 +4,7 @@ namespace Agendamento.Application.Interfaces
 {
     public interface IProdutoService
     {
-        Task<ProdutoDTO> AddProdutoAsync(ProdutoActiveDTO produtoDto);
+        Task<ProdutoDTO> AddProdutoAsync(ProdutoDTO produtoDto);
         Task<ProdutoDTO> GetProdutoByIdAsync(int? id);
         Task<IEnumerable<ProdutoDTO>> GetProdutosAsync();
         Task<ProdutoDTO> UpdateProdutoAsync(ProdutoActiveDTO produtoDto);

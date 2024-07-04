@@ -1,9 +1,7 @@
 using Agendamento.Application.DTOs.Commons;
-using Microsoft.AspNetCore.Http;
 
 namespace Agendamento.Application.DTOs
 {
-
     public class ProdutoBaseDTO : BaseDTO
     {
         public decimal Preco { get; set; }

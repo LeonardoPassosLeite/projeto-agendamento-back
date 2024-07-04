@@ -17,7 +17,7 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProdutoDTO>> Add([FromForm] ProdutoActiveDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Add([FromBody] ProdutoDTO produtoDto)
         {
             try
             {
@@ -94,8 +94,11 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProdutoDTO>> Update([FromForm] ProdutoActiveDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Update(int id, [FromForm] ProdutoActiveDTO produtoDto)
         {
+            if (id != produtoDto.Id)
+                return BadRequest(new { messages = new List<string> { "O ID no caminho não corresponde ao ID no corpo da solicitação." } });
+
             try
             {
                 var produto = await _produtoService.UpdateProdutoAsync(produtoDto);
@@ -103,15 +106,17 @@ namespace Agendamento.WebAPI.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                var errorMessages = ex.Errors.Select(error => error.ErrorMessage).ToList();
+
+                return BadRequest(new { messages = errorMessages });
             }
             catch (NotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { messages = new List<string> { ex.Message } });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+                return StatusCode(500, new { messages = new List<string> { $"Ocorreu um erro interno: {ex.Message}" } });
             }
         }
 

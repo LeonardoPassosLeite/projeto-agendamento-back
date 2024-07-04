@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Agendamento.Application.DTOs.Commons
 {
     public class BaseDTO
