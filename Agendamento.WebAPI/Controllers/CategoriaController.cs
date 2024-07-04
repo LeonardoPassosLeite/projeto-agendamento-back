@@ -1,6 +1,7 @@
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamento.WebAPI.Controllers
@@ -72,11 +73,6 @@ namespace Agendamento.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoriaDTO>> Update(int id, [FromBody] UpdateCategoriaDTO categoriaDto)
         {
-            if (id != categoriaDto.Id)
-            {
-                return BadRequest(new { message = $"ID {id} não corresponde ao ID da categoria." });
-            }
-
             try
             {
                 var categoria = await _categoriaService.UpdateAsync(categoriaDto);
@@ -85,6 +81,10 @@ namespace Agendamento.WebAPI.Controllers
             catch (ValidationException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ namespace Agendamento.WebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(new { message = ex.Message }); 
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

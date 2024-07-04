@@ -5,14 +5,14 @@ namespace Agendamento.Domain.Exceptions
         public NotFoundException(string message) : base(message) { }
     }
 
-    public class ValidationException : Exception
+    public class DomainValidationException : Exception
     {
-        public ValidationException(string message) : base(message) { }
+        public DomainValidationException(string message) : base(message) { }
 
         public static void When(bool hasError, string error)
         {
             if (hasError)
-                throw new ValidationException(error);
+                throw new DomainValidationException(error);
         }
     }
 

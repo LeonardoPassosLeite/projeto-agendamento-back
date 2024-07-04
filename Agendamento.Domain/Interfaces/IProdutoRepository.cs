@@ -4,11 +4,11 @@ namespace Agendamento.Domain.Interfaces
 {
     public interface IProdutoRepository
     {
-        Task<IEnumerable<Produto>> GetProdutosAsync();
-        Task<Produto> GetByIdAsync(int? id);
-        Task<IEnumerable<Produto>> GetByCategoriaIdAsync(int categoriaId);
-        Task<Produto> CreateAsync(Produto produto);
+        Task<Produto> AddAsync(Produto produto);
+        Task<IEnumerable<Produto>> GetAllAsync();
+        Task<Produto?> GetByIdAsync(int? id);
         Task<Produto> UpdateAsync(Produto produto);
         Task DisableAsync(Produto produto);
+        Task<IEnumerable<Produto>> GetByCategoriaIdAsync(int categoriaId);
     }
 }

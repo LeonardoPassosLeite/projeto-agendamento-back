@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Agendamento.Domain.Entities
 {
     public class BaseEntity

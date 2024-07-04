@@ -4,11 +4,11 @@ namespace Agendamento.Application.Interfaces
 {
     public interface IProdutoService
     {
+        Task<ProdutoDTO> AddProdutoAsync(ProdutoActiveDTO produtoDto);
+        Task<ProdutoDTO> GetProdutoByIdAsync(int? id);
         Task<IEnumerable<ProdutoDTO>> GetProdutosAsync();
-        Task<ProdutoDTO> GetByIdAsync(int? id);
-        Task<IEnumerable<ProdutoDTO>> GetByCategoriaIdAsync(int? id);
-        Task<ProdutoDTO> CreateProdutoAsync(ProdutoDTO produtoDto);
-        Task<ProdutoDTO> UpdateProdutoAsync(ProdutoDTO produtoDto);
-        Task DisableProdutoAsync(ProdutoDTO produtoDto);
+        Task<ProdutoDTO> UpdateProdutoAsync(ProdutoActiveDTO produtoDto);
+        Task<IEnumerable<ProdutoDTO>> GetProdutoByCategoriaIdAsync(int? id);
+        Task UpdateStatusProdutoAsync(int id, bool isActive);
     }
 }

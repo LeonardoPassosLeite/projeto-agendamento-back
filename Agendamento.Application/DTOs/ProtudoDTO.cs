@@ -3,14 +3,20 @@ using Microsoft.AspNetCore.Http;
 
 namespace Agendamento.Application.DTOs
 {
-    public class ProdutoDTO : BaseDTO
+
+    public class ProdutoBaseDTO : BaseDTO
     {
         public decimal Preco { get; set; }
-        public string Descricao { get; set; }
-        public IFormFile FotoPrincipal { get; set; }
-        public List<IFormFile> Fotos { get; set; } = new List<IFormFile>();
-        public bool IsActive { get; set; } = true;
+        public string Descricao { get; set; } = string.Empty;
 
         public int CategoriaId { get; set; }
     }
+
+    public class ProdutoDTO : ProdutoBaseDTO
+    {
+        public bool IsActive { get; set; } = true;
+    }
+
+    public class ProdutoActiveDTO : ProdutoBaseDTO
+    { }
 }

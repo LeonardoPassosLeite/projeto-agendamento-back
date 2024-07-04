@@ -4,6 +4,7 @@ using Agendamento.Domain.Entities;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
+using FluentValidation;
 
 namespace Agendamento.Application.Services
 {

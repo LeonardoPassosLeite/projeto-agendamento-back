@@ -1,135 +1,189 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Entities;
+using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace Agendamento.Application.Services
 {
-    // public class ProdutoService : IProdutoService
-    // {
-    //     private readonly IProdutoRepository _produtoRepository;
-    //     private readonly IMapper _mapper;
+    public class ProdutoService : IProdutoService
+    {
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly IMapper _mapper;
+        private readonly IValidator<ProdutoActiveDTO> _validator;
 
-    //     public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper) 
-    //     {
-    //         _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
-    //         _mapper = mapper;
-    //     }
+        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoActiveDTO> validator)
+        {
+            _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
+            _mapper = mapper;
+            _validator = validator;
+        }
 
-    //     public async Task<ProdutoDTO> CreateProdutoAsync(ProdutoDTO produtoDto)
-    //     {
-    //         return await HandleExceptionAsync(async () =>
-    //         {
-    //             var produtoEntity = _mapper.Map<Produto>(produtoDto);
+        public async Task<ProdutoDTO> AddProdutoAsync(ProdutoActiveDTO produtoDto)
+        {
+            if (produtoDto == null)
+                throw new ValidationException("Produto não pode ser nulo.");
 
-    //             if (produtoDto.FotoPrincipal != null)
-    //             {
-    //                 produtoEntity.FotoPrincipal = await SaveFileAsync(produtoDto.FotoPrincipal);
-    //             }
+            ValidationResult validationResult = await _validator.ValidateAsync(produtoDto);
 
-    //             if (produtoDto.Fotos != null && produtoDto.Fotos.Count > 0)
-    //             {
-    //                 produtoEntity.Fotos = new List<string>();
-    //                 foreach (var foto in produtoDto.Fotos)
-    //                 {
-    //                     var fotoPath = await SaveFileAsync(foto);
-    //                     produtoEntity.Fotos.Add(fotoPath);
-    //                 }
-    //             }
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
-    //             await _produtoRepository.CreateAsync(produtoEntity);
-    //             return _mapper.Map<ProdutoDTO>(produtoEntity);
-    //         }, "Ocorreu um erro ao adicionar um produto");
-    //     }
+            try
+            {
+                var produtoEntity = _mapper.Map<Produto>(produtoDto);
+                await _produtoRepository.AddAsync(produtoEntity);
+                return _mapper.Map<ProdutoDTO>(produtoEntity);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao adicionar um produto", ex);
+            }
+        }
 
-    //     private async Task<string> SaveFileAsync(IFormFile file)
-    //     {
-    //         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        private async Task<string> SaveFileAsync(IFormFile file)
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
 
-    //         if (!Directory.Exists(uploadsFolder))
-    //         {
-    //             Directory.CreateDirectory(uploadsFolder);
-    //         }
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
 
-    //         var filePath = Path.Combine(uploadsFolder, Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
+            var filePath = Path.Combine(uploadsFolder, Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
 
-    //         using (var stream = new FileStream(filePath, FileMode.Create))
-    //         {
-    //             await file.CopyToAsync(stream);
-    //         }
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
 
-    //         return filePath;
-    //     }
+            return filePath;
+        }
 
-    //     public async Task DisableProdutoAsync(ProdutoDTO produtoDto)
-    //     {
-    //         await HandleExceptionAsync(async () =>
-    //        {
-    //            var produtoEntity = await _produtoRepository.GetByIdAsync(produtoDto.Id);
-    //            if (produtoEntity == null)
-    //            {
-    //                throw new KeyNotFoundException("Produto não encontrado");
-    //            }
+        public async Task<IEnumerable<ProdutoDTO>> GetProdutosAsync()
+        {
+            try
+            {
+                var produtoEntities = await _produtoRepository.GetAllAsync();
+                return _mapper.Map<IEnumerable<ProdutoDTO>>(produtoEntities);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao buscar os produtos", ex);
+            }
+        }
 
-    //            produtoEntity.Disable();
-    //            await _produtoRepository.UpdateAsync(produtoEntity);
-    //            return Task.CompletedTask;
-    //        }, $"Ocorreu um erro ao desativar o produto com id {produtoDto.Id}");
-    //     }
+        public async Task<ProdutoDTO> GetProdutoByIdAsync(int? id)
+        {
+            if (id <= 0)
+            {
+                throw new ValidationException("Id inválido.");
+            }
 
-    //     public async Task<IEnumerable<ProdutoDTO>> GetByCategoriaIdAsync(int? id)
-    //     {
-    //         if (id == null)
-    //         {
-    //             throw new ValidationException("Id da categoria não pode ser nulo.");
-    //         }
+            try
+            {
+                var produtoEntity = await _produtoRepository.GetByIdAsync(id);
+                if (produtoEntity == null)
+                {
+                    throw new NotFoundException($"Produto com Id {id} não encontrado.");
+                }
 
-    //         return await HandleExceptionAsync(async () =>
-    //         {
-    //             var produtos = await _produtoRepository.GetByCategoriaIdAsync(id.Value);
-    //             return _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
-    //         }, $"Ocorreu um erro ao obter os produtos da categoria com id {id}");
-    //     }
+                return _mapper.Map<ProdutoDTO>(produtoEntity);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException(ex.Message);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao buscar um produto por id", ex);
+            }
+        }
 
-    //     public async Task<ProdutoDTO> GetByIdAsync(int? id)
-    //     {
-    //         return await HandleExceptionAsync(async () =>
-    //        {
-    //            var produtoEntity = await _produtoRepository.GetByIdAsync(id);
-    //            if (produtoEntity == null)
-    //            {
-    //                throw new KeyNotFoundException("Produto não encontrado");
-    //            }
-    //            return _mapper.Map<ProdutoDTO>(produtoEntity);
-    //        }, $"Ocorreu um erro ao obter o produto com id {id}");
-    //     }
+        public async Task<ProdutoDTO> UpdateProdutoAsync(ProdutoActiveDTO produtoDto)
+        {
+            if (produtoDto == null)
+                throw new ValidationException("Produto não pode ser nulo");
 
-    //     public async Task<IEnumerable<ProdutoDTO>> GetProdutosAsync()
-    //     {
-    //         return await HandleExceptionAsync(async () =>
-    //       {
-    //           var produtoEntities = await _produtoRepository.GetProdutosAsync();
-    //           return _mapper.Map<IEnumerable<ProdutoDTO>>(produtoEntities);
-    //       }, "Ocorreu um erro ao obter todos os produtos");
-    //     }
+            if (produtoDto.Id <= 0)
+                throw new ValidationException("Id inválido.");
 
-    //     public async Task<ProdutoDTO> UpdateProdutoAsync(ProdutoDTO produtoDto)
-    //     {
-    //         return await HandleExceptionAsync(async () =>
-    //         {
-    //             var produtoEntity = await _produtoRepository.GetByIdAsync(produtoDto.Id);
-    //             if (produtoEntity == null)
-    //             {
-    //                 throw new KeyNotFoundException("Produto não encontrado");
-    //             }
-    //             _mapper.Map(produtoDto, produtoEntity);
-    //             await _produtoRepository.UpdateAsync(produtoEntity);
-    //             return _mapper.Map<ProdutoDTO>(produtoEntity);
-    //         }, $"Ocorreu um erro ao atualizar o produto com id {produtoDto.Id}");
-    //     }
-    // }
+            try
+            {
+                var produtoEntity = await _produtoRepository.GetByIdAsync(produtoDto.Id);
+
+                if (produtoEntity == null)
+                    throw new NotFoundException($"Produto com Id {produtoDto.Id} não encontrada.");
+
+                _mapper.Map(produtoDto, produtoEntity);
+
+                await _produtoRepository.UpdateAsync(produtoEntity);
+
+                return _mapper.Map<ProdutoDTO>(produtoEntity);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException(ex.Message);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao editar um produto", ex);
+            }
+        }
+
+        public async Task UpdateStatusProdutoAsync(int id, bool isActive)
+        {
+            if (id <= 0)
+            {
+                throw new ValidationException("Id inválido.");
+            }
+
+            try
+            {
+                var produtoEntity = await _produtoRepository.GetByIdAsync(id);
+                if (produtoEntity == null)
+                {
+                    throw new NotFoundException($"Produto com Id {id} não encontrada.");
+                }
+
+                produtoEntity.IsActive = isActive;
+
+                await _produtoRepository.UpdateAsync(produtoEntity);
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException(ex.Message);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException($"Ocorreu um erro ao {(isActive ? "ativar" : "desativar")} o produto", ex);
+            }
+        }
+
+        public async Task<IEnumerable<ProdutoDTO>> GetProdutoByCategoriaIdAsync(int? id)
+        {
+            if (id == null)
+            {
+                throw new ValidationException("Id da categoria não pode ser nulo.");
+            }
+
+            try
+            {
+                var produtos = await _produtoRepository.GetByCategoriaIdAsync(id.Value);
+                if (!produtos.Any())
+                {
+                    throw new NotFoundException($"Nenhum produto encontrado para a categoria com Id {id.Value}.");
+                }
+
+                return _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException($"Ocorreu um erro ao obter os produtos da categoria com id {id}", ex);
+            }
+        }
+    }
 }

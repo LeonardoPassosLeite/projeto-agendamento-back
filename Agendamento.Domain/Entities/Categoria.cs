@@ -14,7 +14,7 @@ namespace Agendamento.Domain.Entities
 
         public Categoria(int id, string nome)
         {
-            ValidationException.When(id < 0, "Id inválido");
+            DomainValidationException.When(id < 0, "Id inválido");
 
             Id = id;
             IniciaValor(nome);
@@ -27,7 +27,7 @@ namespace Agendamento.Domain.Entities
 
         public void Disable()
         {
-            ValidationException.When(Produtos.Any(p => p.IsActive), "Não é possível desativar a categoria enquanto houver produtos ativos.");
+            DomainValidationException.When(Produtos.Any(p => p.IsActive), "Não é possível desativar a categoria enquanto houver produtos ativos.");
             IsActive = false;
         }
 
@@ -40,9 +40,9 @@ namespace Agendamento.Domain.Entities
 
         private void ValidaExcessoes()
         {
-            ValidationException.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
-            ValidationException.When(Nome.Length < 3, "O nome deve ter no mínimo 3 caracteres");
-            ValidationException.When(Nome.Length > 100, "O nome deve ter no máximo 100 caracteres");
+            DomainValidationException.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
+            DomainValidationException.When(Nome.Length < 3, "O nome deve ter no mínimo 3 caracteres");
+            DomainValidationException.When(Nome.Length > 100, "O nome deve ter no máximo 100 caracteres");
         }
     }
 }

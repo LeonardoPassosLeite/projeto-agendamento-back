@@ -33,8 +33,7 @@ namespace Agendamento.Infra.Data.Repositories
 
         public async Task<Categoria> UpdateAsync(Categoria categoria)
         {
-
-            _categoriaContext.Entry(categoria).State = EntityState.Modified;
+            _categoriaContext.Update(categoria);
             await _categoriaContext.SaveChangesAsync();
             return categoria;
         }

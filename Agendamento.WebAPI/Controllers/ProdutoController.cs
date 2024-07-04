@@ -1,5 +1,7 @@
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
+using Agendamento.Domain.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamento.WebAPI.Controllers
@@ -12,6 +14,25 @@ namespace Agendamento.WebAPI.Controllers
         public ProdutoController(IProdutoService produtoService)
         {
             _produtoService = produtoService ?? throw new ArgumentNullException(nameof(produtoService));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProdutoDTO>> Add([FromForm] ProdutoActiveDTO produtoDto)
+        {
+            try
+            {
+                var produto = await _produtoService.AddProdutoAsync(produtoDto);
+                return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
+            }
+            catch (ValidationException ex)
+            {
+                var errorMessages = ex.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { messages = errorMessages });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
         }
 
         [HttpGet]
@@ -33,12 +54,16 @@ namespace Agendamento.WebAPI.Controllers
         {
             try
             {
-                var produto = await _produtoService.GetByIdAsync(id);
-                if (produto == null)
-                {
-                    return NotFound($"Produto com Id {id} não encontrada.");
-                }
+                var produto = await _produtoService.GetProdutoByIdAsync(id);
                 return Ok(produto);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -51,27 +76,16 @@ namespace Agendamento.WebAPI.Controllers
         {
             try
             {
-                var produtos = await _produtoService.GetByCategoriaIdAsync(categoriaId);
+                var produtos = await _produtoService.GetProdutoByCategoriaIdAsync(categoriaId);
                 return Ok(produtos);
             }
-            catch (Exception ex)
+            catch (ValidationException ex)
             {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
             }
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<ProdutoDTO>> Create([FromForm] ProdutoDTO produtoDto)
-        {
-            if (produtoDto == null)
+            catch (NotFoundException ex)
             {
-                return BadRequest("Dados inválidos.");
-            }
-
-            try
-            {
-                var produto = await _produtoService.CreateProdutoAsync(produtoDto);
-                return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -80,21 +94,20 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProdutoDTO>> Update(int id, [FromBody] ProdutoDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Update([FromForm] ProdutoActiveDTO produtoDto)
         {
-            if (produtoDto == null || id != produtoDto.Id)
-            {
-                return BadRequest("Dados inválidos.");
-            }
-
             try
             {
                 var produto = await _produtoService.UpdateProdutoAsync(produtoDto);
-                if (produto == null)
-                {
-                    return NotFound($"Produto com Id {id} não encontrada.");
-                }
                 return Ok(produto);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -102,19 +115,21 @@ namespace Agendamento.WebAPI.Controllers
             }
         }
 
-        [HttpPost("{id}/disable")]
-        public async Task<ActionResult> Disable(int id)
+        [HttpPost("{id}/status")]
+        public async Task<ActionResult> Disable(int id, [FromQuery] bool status)
         {
             try
             {
-                var produtoDto = await _produtoService.GetByIdAsync(id);
-                if (produtoDto == null)
-                {
-                    return NotFound($"Produto com Id {id} não encontrada.");
-                }
-
-                await _produtoService.DisableProdutoAsync(produtoDto);
+                await _produtoService.UpdateStatusProdutoAsync(id, status);
                 return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

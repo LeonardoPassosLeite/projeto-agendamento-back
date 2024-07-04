@@ -1,9 +1,11 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Application.Mappings;
 using Agendamento.Application.Services;
+using Agendamento.Application.Validators;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
 using Agendamento.Infra.Data.Repositories;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +25,10 @@ namespace Agendamento.Infra.IoC
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
             services.AddScoped<ICategoriaService, CategoriaService>();
-            // services.AddScoped<IProdutoService, ProdutoService>();
+            services.AddScoped<IProdutoService, ProdutoService>();
             services.AddAutoMapper(typeof(DoaminToDTOMappingProfile));
+
+            services.AddValidatorsFromAssemblyContaining<ProdutoDTOValidator>();
 
             return services;
         }
