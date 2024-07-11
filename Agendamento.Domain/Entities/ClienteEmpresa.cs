@@ -3,7 +3,7 @@ using Agendamento.Domain.Exceptions;
 
 namespace Agendamento.Domain.Entities
 {
-    public sealed class ClienteEmpresa : BaseEntity
+    public sealed class ClienteEmpresa : SimpleEntity
     {
         public string Telefone { get; private set; }
         public string Cpf { get; private set; }

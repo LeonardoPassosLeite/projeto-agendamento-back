@@ -4,9 +4,9 @@ namespace Agendamento.Application.DTOs
 {
     public class CategoriaDTO : BaseDTO
     {
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 
-    public class UpdateCategoriaDTO : BaseDTO
+    public class CategoriaUpdateDTO : BaseDTO
     { }
 }

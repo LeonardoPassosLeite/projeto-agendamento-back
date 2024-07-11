@@ -2,7 +2,7 @@ using Agendamento.Domain.Exceptions;
 
 namespace Agendamento.Domain.Entities
 {
-    public sealed class Categoria : BaseEntity
+    public sealed class Categoria : SimpleEntity
     {
         public bool IsActive { get; set; } = true;
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();

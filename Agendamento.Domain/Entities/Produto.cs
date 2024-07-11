@@ -2,26 +2,35 @@ using Agendamento.Domain.Exceptions;
 
 namespace Agendamento.Domain.Entities
 {
-    public sealed class Produto : BaseEntity
+    public sealed class Produto : SimpleEntity
     {
         public decimal Preco { get; private set; }
         public string? Descricao { get; private set; }
-        public bool IsActive { get; set; } = true;
 
         public int CategoriaId { get; set; }
         public required Categoria Categoria { get; set; }
 
-        public Produto(string nome, decimal preco, string? descricao, int categoriaId)
+        public int? FotoPrincipalId { get; set; }
+        public Foto? FotoPrincipal { get; set; }
+
+        public bool IsActive { get; set; } = true;
+        public bool IsRascunho { get; set; } = true;
+
+        private Produto() { }
+
+        public Produto(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
             Nome = nome;
             Preco = preco;
             Descricao = descricao;
             CategoriaId = categoriaId;
+            FotoPrincipalId = fotoPrincipalId;
+            FotoPrincipal = fotoPrincipal;
 
             ValidaExcessoes();
         }
 
-        public Produto(int id, string nome, decimal preco, string? descricao, int categoriaId)
+        public Produto(int id, string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
             DomainValidationException.When(id < 0, "Valor de Id é inválido");
 
@@ -30,18 +39,28 @@ namespace Agendamento.Domain.Entities
             Preco = preco;
             Descricao = descricao;
             CategoriaId = categoriaId;
+            FotoPrincipalId = fotoPrincipalId;
+            FotoPrincipal = fotoPrincipal;
 
             ValidaExcessoes();
         }
 
-        public void Update(string nome, decimal preco, string? descricao, int categoriaId)
+        public void Update(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
             Nome = nome;
             Preco = preco;
             Descricao = descricao;
             CategoriaId = categoriaId;
+            FotoPrincipalId = fotoPrincipalId;
+            FotoPrincipal = fotoPrincipal;
 
             ValidaExcessoes();
+        }
+
+        public void SetFotoPrincipal(Foto foto)
+        {
+            FotoPrincipal = foto;
+            FotoPrincipalId = foto.Id;
         }
 
         public void Disable()

@@ -8,36 +8,14 @@ using FluentValidation;
 
 namespace Agendamento.Application.Services
 {
-    public class CategoriaService : ICategoriaService
+    public class CategoriaService : GenericService<Categoria, CategoriaDTO, CategoriaUpdateDTO>, ICategoriaService
     {
         private readonly ICategoriaRepository _categoriaRepository;
-        private readonly IMapper _mapper;
 
-        public CategoriaService(ICategoriaRepository categoriaRepository, IMapper mapper)
-
+        public CategoriaService(ICategoriaRepository categoriaRepository, IMapper mapper, IValidator<CategoriaDTO> validatorProduto, IValidator<CategoriaUpdateDTO> validatorCategoriaActive)
+            : base(categoriaRepository, mapper, validatorProduto, validatorCategoriaActive)
         {
-            _categoriaRepository = categoriaRepository;
-            _mapper = mapper;
-        }
-
-        public async Task<CategoriaDTO> AddAsync(CategoriaDTO categoriaDto)
-        {
-            if (categoriaDto == null)
-                throw new ValidationException("Categoria não pode ser nulo.");
-
-            if (!categoriaDto.IsActive)
-                throw new ValidationException("Categoria não pode criada com status desativado.");
-
-            try
-            {
-                var categoriaEntity = _mapper.Map<Categoria>(categoriaDto);
-                await _categoriaRepository.AddAsync(categoriaEntity);
-                return _mapper.Map<CategoriaDTO>(categoriaEntity);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao adicionar uma categoria", ex);
-            }
+            _categoriaRepository = categoriaRepository ?? throw new ArgumentNullException(nameof(categoriaRepository));
         }
 
         public async Task<IEnumerable<CategoriaDTO>> GetAllAsync()
@@ -50,91 +28,6 @@ namespace Agendamento.Application.Services
             catch (DatabaseException ex)
             {
                 throw new ApplicationException("Ocorreu um erro ao buscar as categorias", ex);
-            }
-        }
-
-        public async Task<CategoriaDTO> GetByIdAsync(int id)
-        {
-            if (id <= 0)
-            {
-                throw new ValidationException("Id inválido.");
-            }
-
-            try
-            {
-                var categoriaEntity = await _categoriaRepository.GetByIdAsync(id);
-                if (categoriaEntity == null)
-                {
-                    throw new NotFoundException($"Categoria com Id {id} não encontrado.");
-                }
-
-                return _mapper.Map<CategoriaDTO>(categoriaEntity);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao buscar uma categoria por id", ex);
-            }
-        }
-
-        public async Task<CategoriaDTO> UpdateAsync(UpdateCategoriaDTO categoriaDto)
-        {
-            if (categoriaDto == null)
-                throw new ValidationException("Categoria não pode ser nulo");
-
-            if (categoriaDto.Id <= 0)
-                throw new ValidationException("Id inválido.");
-
-            try
-            {
-                var categoriaEntity = await _categoriaRepository.GetByIdAsync(categoriaDto.Id);
-
-                if (categoriaEntity == null)
-                    throw new NotFoundException($"Categoria com Id {categoriaDto.Id} não encontrada.");
-
-                _mapper.Map(categoriaDto, categoriaEntity);
-
-                await _categoriaRepository.UpdateAsync(categoriaEntity);
-
-                return _mapper.Map<CategoriaDTO>(categoriaEntity);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao editar uma categoria", ex);
-            }
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            if (id <= 0)
-            {
-                throw new ValidationException("Id inválido.");
-            }
-
-            try
-            {
-                var categoriaEntity = await _categoriaRepository.GetByIdAsync(id);
-                if (categoriaEntity == null)
-                {
-                    throw new NotFoundException($"Categoria com Id {id} não encontrada.");
-                }
-
-                await _categoriaRepository.DeleteAsync(id);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao excluir a categoria", ex);
             }
         }
 

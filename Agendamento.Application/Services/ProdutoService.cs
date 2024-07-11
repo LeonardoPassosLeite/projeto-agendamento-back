@@ -1,56 +1,29 @@
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
-using Agendamento.Application.Validators;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Agendamento.Application.Services
 {
-    public class ProdutoService : IProdutoService
+    public class ProdutoService : GenericService<Produto, ProdutoDTO, ProdutoUpdateDTO>, IProdutoService
     {
         private readonly IProdutoRepository _produtoRepository;
-        private readonly IMapper _mapper;
-        private readonly IValidator<ProdutoDTO> _validator;
 
-        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> validator)
+        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> validatorProduto, IValidator<ProdutoUpdateDTO> validatorProdutoActive)
+            : base(produtoRepository, mapper, validatorProduto, validatorProdutoActive)
         {
             _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<ProdutoDTO> AddProdutoAsync(ProdutoDTO produtoDto)
-        {
-            if (produtoDto == null)
-                throw new ValidationException("Produto não pode ser nulo.");
-
-            ValidationResult validationResult = await _validator.ValidateAsync(produtoDto);
-
-            if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
-
-            try
-            {
-                var produtoEntity = _mapper.Map<Produto>(produtoDto);
-                await _produtoRepository.AddAsync(produtoEntity);
-                return _mapper.Map<ProdutoDTO>(produtoEntity);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao adicionar um produto", ex);
-            }
-        }
-
-        public async Task<IEnumerable<ProdutoDTO>> GetProdutosAsync()
+        public async Task<IEnumerable<ProdutoFotoDTO>> GetAllAsync()
         {
             try
             {
                 var produtoEntities = await _produtoRepository.GetAllAsync();
-                return _mapper.Map<IEnumerable<ProdutoDTO>>(produtoEntities);
+                return _mapper.Map<IEnumerable<ProdutoFotoDTO>>(produtoEntities);
             }
             catch (DatabaseException ex)
             {
@@ -58,76 +31,41 @@ namespace Agendamento.Application.Services
             }
         }
 
-        public async Task<ProdutoDTO> GetProdutoByIdAsync(int? id)
+        public async Task FinalizarProdutoAsync(int produtoId)
         {
-            if (id <= 0)
-            {
-                throw new ValidationException("Id inválido.");
-            }
+            var produtoEntity = await _produtoRepository.GetByIdAsync(produtoId);
 
-            try
-            {
-                var produtoEntity = await _produtoRepository.GetByIdAsync(id);
-                if (produtoEntity == null)
-                {
-                    throw new NotFoundException($"Produto com Id {id} não encontrado.");
-                }
+            if (produtoEntity == null)
+                throw new NotFoundException($"Produto com Id {produtoId} não encontrado.");
 
-                return _mapper.Map<ProdutoDTO>(produtoEntity);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao buscar um produto por id", ex);
-            }
+            produtoEntity.IsRascunho = false;
+            await _produtoRepository.UpdateAsync(produtoEntity);
         }
 
-        public async Task<ProdutoDTO> UpdateProdutoAsync(ProdutoActiveDTO produtoDto)
+        public async Task AddFotoToProdutoAsync(int produtoId, FotoDTO fotoDto)
         {
-            if (produtoDto == null)
-                throw new ValidationException("Produto não pode ser nulo");
+            var produto = await _produtoRepository.GetByIdAsync(produtoId);
 
-            if (produtoDto.Id <= 0)
-                throw new ValidationException("Id inválido.");
+            if (produto == null)
+                throw new NotFoundException($"Produto com Id {produtoId} não encontrado.");
 
-            var validator = new ProdutoActiveDTOValidator();
-            ValidationResult validationResult = await validator.ValidateAsync(produtoDto);
+            var foto = _mapper.Map<Foto>(fotoDto);
 
-            if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
+            if (produto.FotoPrincipalId != null && produto.FotoPrincipalId == foto.Id)
+                produto.FotoPrincipal = foto;
 
-            try
-            {
-                var produtoEntity = await _produtoRepository.GetByIdAsync(produtoDto.Id);
+            else
+                produto.SetFotoPrincipal(foto);
 
-                if (produtoEntity == null)
-                    throw new NotFoundException($"Produto com Id {produtoDto.Id} não encontrada.");
+            await _produtoRepository.UpdateAsync(produto);
 
-                _mapper.Map(produtoDto, produtoEntity);
-
-                await _produtoRepository.UpdateAsync(produtoEntity);
-
-                return _mapper.Map<ProdutoDTO>(produtoEntity);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao editar um produto", ex);
-            }
+            await FinalizarProdutoAsync(produtoId);
         }
 
         public async Task UpdateStatusProdutoAsync(int id, bool isActive)
         {
             if (id <= 0)
-            {
                 throw new ValidationException("Id inválido.");
-            }
 
             try
             {
@@ -154,17 +92,13 @@ namespace Agendamento.Application.Services
         public async Task<IEnumerable<ProdutoDTO>> GetProdutoByCategoriaIdAsync(int? id)
         {
             if (id == null)
-            {
                 throw new ValidationException("Id da categoria não pode ser nulo.");
-            }
 
             try
             {
                 var produtos = await _produtoRepository.GetByCategoriaIdAsync(id.Value);
                 if (!produtos.Any())
-                {
                     throw new NotFoundException($"Nenhum produto encontrado para a categoria com Id {id.Value}.");
-                }
 
                 return _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
             }

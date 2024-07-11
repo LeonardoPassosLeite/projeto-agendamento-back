@@ -24,7 +24,7 @@ namespace Agendamento.Application.Validators
         }
     }
 
-    public class ProdutoActiveDTOValidator : AbstractValidator<ProdutoActiveDTO>
+    public class ProdutoActiveDTOValidator : AbstractValidator<ProdutoUpdateDTO>
     {
         public ProdutoActiveDTOValidator()
         {

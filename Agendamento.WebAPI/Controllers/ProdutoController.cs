@@ -10,10 +10,13 @@ namespace Agendamento.WebAPI.Controllers
     public class ProdutoController : ControllerBase
     {
         private readonly IProdutoService _produtoService;
+        private readonly IFotoService _fotoService;
 
-        public ProdutoController(IProdutoService produtoService)
+
+        public ProdutoController(IProdutoService produtoService, IFotoService fotoService)
         {
             _produtoService = produtoService ?? throw new ArgumentNullException(nameof(produtoService));
+            _fotoService = fotoService ?? throw new ArgumentNullException(nameof(fotoService));
         }
 
         [HttpPost]
@@ -21,7 +24,7 @@ namespace Agendamento.WebAPI.Controllers
         {
             try
             {
-                var produto = await _produtoService.AddProdutoAsync(produtoDto);
+                var produto = await _produtoService.AddAsync(produtoDto);
                 return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
             }
             catch (ValidationException ex)
@@ -36,11 +39,11 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ProdutoFotoDTO>>> GetAll()
         {
             try
             {
-                var produtos = await _produtoService.GetProdutosAsync();
+                var produtos = await _produtoService.GetAllAsync();
                 return Ok(produtos);
             }
             catch (Exception ex)
@@ -54,7 +57,7 @@ namespace Agendamento.WebAPI.Controllers
         {
             try
             {
-                var produto = await _produtoService.GetProdutoByIdAsync(id);
+                var produto = await _produtoService.GetByIdAsync(id);
                 return Ok(produto);
             }
             catch (ValidationException ex)
@@ -94,14 +97,14 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProdutoDTO>> Update(int id, [FromForm] ProdutoActiveDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Update(int id, [FromForm] ProdutoUpdateDTO produtoDto)
         {
             if (id != produtoDto.Id)
                 return BadRequest(new { messages = new List<string> { "O ID no caminho não corresponde ao ID no corpo da solicitação." } });
 
             try
             {
-                var produto = await _produtoService.UpdateProdutoAsync(produtoDto);
+                var produto = await _produtoService.UpdateAsync(produtoDto);
                 return Ok(produto);
             }
             catch (ValidationException ex)

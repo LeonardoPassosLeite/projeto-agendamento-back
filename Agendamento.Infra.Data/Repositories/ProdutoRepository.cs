@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
@@ -5,37 +6,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Agendamento.Infra.Data.Repositories
 {
-    public class ProdutoRepository : IProdutoRepository
+    public class ProdutoRepository : GenericRepository<Produto>, IProdutoRepository
     {
-        ApplicationDbContext _produtoContext;
-        public ProdutoRepository(ApplicationDbContext context)
+        private readonly ApplicationDbContext _produtoContext;
+
+        public ProdutoRepository(ApplicationDbContext prdutoContext) : base(prdutoContext)
         {
-            _produtoContext = context;
+            _produtoContext = prdutoContext;
         }
 
-        public async Task<Produto> AddAsync(Produto produto)
+        public override async Task<IEnumerable<Produto>> GetAllAsync(Expression<Func<Produto, object>>? orderBy = null)
         {
-            _produtoContext.Produtos.Add(produto);
-            await _produtoContext.SaveChangesAsync();
-
-            return produto;
-        }
-
-        public async Task<IEnumerable<Produto>> GetAllAsync()
-        {
-            return await _produtoContext.Produtos.OrderBy(p => p.Id).ToListAsync();
-        }
-
-        public async Task<Produto?> GetByIdAsync(int? id)
-        {
-            return await _produtoContext.Produtos.FindAsync(id);
-        }
-
-        public async Task<Produto> UpdateAsync(Produto produto)
-        {
-            _produtoContext.Update(produto);
-            await _produtoContext.SaveChangesAsync();
-            return produto;
+            var query = _produtoContext.Produtos.Include(p => p.FotoPrincipal).AsQueryable();
+            if (orderBy != null)
+            {
+                query = query.OrderBy(orderBy);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task DisableAsync(Produto produto)
@@ -49,6 +36,7 @@ namespace Agendamento.Infra.Data.Repositories
             return await _produtoContext.Produtos
              .Where(p => p.CategoriaId == categoriaId)
              .Include(p => p.Categoria)
+             .Include(p => p.FotoPrincipal)
              .ToListAsync();
         }
     }

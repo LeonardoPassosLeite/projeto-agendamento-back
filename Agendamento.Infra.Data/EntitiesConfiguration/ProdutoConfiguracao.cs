@@ -8,14 +8,20 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<Produto> builder)
         {
-            builder.HasKey(t => t.Id);
-            builder.Property(t => t.Id).ValueGeneratedOnAdd();
+            builder.HasKey(p => p.Id);
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder.Property(p => p.Nome).HasMaxLength(100).IsRequired();
-            builder.Property(p => p.Descricao).HasMaxLength(200).IsRequired();
+            builder.Property(p => p.Descricao).HasMaxLength(200);
             builder.Property(p => p.Preco).HasPrecision(10, 2);
 
-            builder.HasOne(e => e.Categoria).WithMany(e => e.Produtos)
-                .HasForeignKey(e => e.CategoriaId);
+            builder.HasOne(p => p.Categoria)
+                .WithMany(c => c.Produtos)
+                .HasForeignKey(c => c.CategoriaId);
+
+            builder.HasOne(p => p.FotoPrincipal)
+                .WithOne()
+                .HasForeignKey<Produto>(p => p.FotoPrincipalId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

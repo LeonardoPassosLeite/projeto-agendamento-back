@@ -26,11 +26,12 @@ namespace Agendamento.WebAPI.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                var errorMessages = ex.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { messages = errorMessages });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Ocorreu um erro interno.");
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -71,7 +72,7 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<CategoriaDTO>> Update(int id, [FromBody] UpdateCategoriaDTO categoriaDto)
+        public async Task<ActionResult<CategoriaDTO>> Update(int id, [FromBody] CategoriaUpdateDTO categoriaDto)
         {
             try
             {
@@ -80,7 +81,9 @@ namespace Agendamento.WebAPI.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                var errorMessages = ex.Errors.Select(error => error.ErrorMessage).ToList();
+
+                return BadRequest(new { messages = errorMessages });
             }
             catch (NotFoundException ex)
             {
