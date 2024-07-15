@@ -1,16 +1,16 @@
 using Agendamento.Infra.IoC;
 using Microsoft.OpenApi.Models;
+using Agendamento.WebAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configuração do Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-    c.OperationFilter<FileUploadOperation>(); // Adicione esta linha
+    c.OperationFilter<FileUploadOperation>(); 
 });
 
 builder.Services.AddInfrastructures(builder.Configuration);
@@ -35,8 +35,10 @@ else
     app.UseHsts();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseHttpsRedirection();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 app.UseAuthorization();
 
 app.MapControllers();

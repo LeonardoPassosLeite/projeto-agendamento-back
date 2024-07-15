@@ -1,7 +1,5 @@
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
-using Agendamento.Domain.Exceptions;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamento.Web.Controllers
@@ -23,49 +21,15 @@ namespace Agendamento.Web.Controllers
             if (fotoDto == null)
                 return BadRequest("Foto não pode ser nula.");
 
-            try
-            {
-                var foto = await _fotoService.AddFotoAsync(fotoDto);
-                return CreatedAtAction(nameof(GetFotoById), new { id = foto.Id }, foto);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var foto = await _fotoService.AddFotoAsync(fotoDto);
+            return CreatedAtAction(nameof(GetFotoById), new { id = foto.Id }, foto);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFotoById(int id)
         {
-            try
-            {
-                var foto = await _fotoService.GetFotoByIdAsync(id);
-                return Ok(foto);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var foto = await _fotoService.GetFotoByIdAsync(id);
+            return Ok(foto);
         }
     }
 }

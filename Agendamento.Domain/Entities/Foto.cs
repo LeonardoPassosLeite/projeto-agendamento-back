@@ -6,6 +6,7 @@ namespace Agendamento.Domain.Entities
     {
         public string? Url { get; private set; }
         public string? FilePath { get; private set; }
+        public bool IsPrincial { get; private set; } = true;
         public int ProdutoId { get; set; }
         public required Produto Produto { get; set; }
 
@@ -28,6 +29,11 @@ namespace Agendamento.Domain.Entities
             ProdutoId = produtoId;
 
             ValidaExcessoes();
+        }
+
+        public void SetPrincipal(bool isPrincial)
+        {
+            IsPrincial = isPrincial;
         }
 
         private void ValidaExcessoes()
