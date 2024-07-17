@@ -18,25 +18,22 @@ namespace Agendamento.Domain.Entities
 
         private Produto() { }
 
-        public Produto(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
-        {
-            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
-            ValidateExceptions();
-        }
-
         public Produto(int id, string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
             DomainValidationException.When(id < 0, "Valor de Id é inválido");
 
             Id = id;
             InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
-            ValidateExceptions();
+        }
+
+        public Produto(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
+        {
+            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
         }
 
         public void Update(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
             InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
-            ValidateExceptions();
         }
 
         public void SetFotoPrincipal(Foto foto)

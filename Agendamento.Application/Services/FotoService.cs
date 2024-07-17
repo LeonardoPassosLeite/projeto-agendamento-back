@@ -26,6 +26,10 @@ namespace Agendamento.Application.Services
             if (fotoDto == null)
                 throw new ValidationException("Foto não pode ser nula.");
 
+            var produto = await _produtoService.GetByIdAsync(fotoDto.ProdutoId);
+            if (produto == null)
+                throw new NotFoundException($"Produto com Id {fotoDto.ProdutoId} não encontrado.");
+
             var fotoEntity = _mapper.Map<Foto>(fotoDto);
 
             if (fotoEntity.IsPrincipal)
@@ -52,5 +56,33 @@ namespace Agendamento.Application.Services
 
             return _mapper.Map<FotoDTO>(fotoEntity);
         }
+
+        public async Task<FotoDTO> UpdateFotoAsync(FotoDTO fotoDto)
+        {
+            if (fotoDto == null)
+                throw new ValidationException("Foto não pode ser nulo");
+
+            try
+            {
+                var foto = await _fotoRepository.GetByIdAsync(fotoDto.Id);
+                if (foto == null)
+                    throw new NotFoundException($"Foto com Id {fotoDto.Id} não encontrada");
+
+                fotoDto.ProdutoId = foto.ProdutoId;
+
+                _mapper.Map(fotoDto, foto);
+
+                var updatedEntity = await _fotoRepository.UpdateAsync(foto);
+                if (updatedEntity == null)
+                    throw new NotFoundException($"Foto com Id {fotoDto.Id} não encontrada");
+
+                return _mapper.Map<FotoDTO>(updatedEntity);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao atualizar a foto", ex);
+            }
+        }
+
     }
 }

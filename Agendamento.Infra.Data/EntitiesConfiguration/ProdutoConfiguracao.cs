@@ -22,6 +22,22 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                 .WithOne()
                 .HasForeignKey<Produto>(p => p.FotoPrincipalId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasData(
+                          new
+                          {
+                              Id = 1,
+                              Nome = "Produto 1",
+                              Preco = 100.00M,
+                              Descricao = "Descrição Produto",
+                              CategoriaId = 1,
+                              FotoPrincipalId = (int?)null,
+                              IsActive = true,
+                              IsRascunho = true,
+                              DataCriacao = DateTime.UtcNow,
+                              DataAtualizacao = DateTime.UtcNow
+                          }
+                      );
         }
     }
 }

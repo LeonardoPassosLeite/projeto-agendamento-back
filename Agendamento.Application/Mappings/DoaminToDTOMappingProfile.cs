@@ -17,7 +17,6 @@ namespace Agendamento.Application.Mappings
                  Id = src.FotoPrincipal.Id,
                  Url = src.FotoPrincipal.Url,
                  FilePath = src.FotoPrincipal.FilePath,
-                 IsPrincipal = src.FotoPrincipal.IsPrincipal,
                  ProdutoId = src.Id
              } : null));
             CreateMap<Cliente, ClienteDTO>().ReverseMap();

@@ -113,7 +113,6 @@ namespace Agendamento.Application.Services
                 if (produto.FotoPrincipal == null)
                     throw new ConflictException("Não é possivel editar um produto sem uma foto principal");
 
-
                 var fotoPrincipal = produto.FotoPrincipal;
 
                 _mapper.Map(produtoDto, produto);

@@ -9,10 +9,12 @@ namespace Agendamento.Web.Controllers
     public class FotosController : ControllerBase
     {
         private readonly IFotoService _fotoService;
+        private readonly IWebHostEnvironment _env;
 
-        public FotosController(IFotoService fotoService)
+        public FotosController(IFotoService fotoService, IWebHostEnvironment env)
         {
             _fotoService = fotoService;
+            _env = env;
         }
 
         [HttpPost]
@@ -23,6 +25,17 @@ namespace Agendamento.Web.Controllers
 
             var foto = await _fotoService.AddFotoAsync(fotoDto);
             return CreatedAtAction(nameof(GetFotoById), new { id = foto.Id }, foto);
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<FotoDTO>> Update(int id, [FromBody] FotoDTO fotoDto)
+        {
+            if (id != fotoDto.Id)
+                return BadRequest("ID inválido");
+
+            var result = await _fotoService.UpdateFotoAsync(fotoDto);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
