@@ -6,8 +6,8 @@ namespace Agendamento.Domain.Interfaces
     {
         Task<T> AddAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>? orderBy = null);
-        Task<T?> GetByIdAsync(int? id);
-        Task<T> UpdateAsync(T entity);
+        Task<T?> GetByIdAsync(int id);
+        Task<T?> UpdateAsync(T? entity);
         Task DeleteAsync(int id);
     }
 }

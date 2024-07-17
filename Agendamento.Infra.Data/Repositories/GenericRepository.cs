@@ -25,22 +25,39 @@ namespace Agendamento.Infra.Data.Repositories
         {
             var query = _context.Set<T>().AsQueryable();
             if (orderBy != null)
-            {
                 query = query.OrderBy(orderBy);
-            }
+
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(int? id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public async Task<T?> UpdateAsync(T? entity)
         {
-            _context.Update(entity);
+            if (entity == null)
+                return null;
+
+            var keyName = _context.Model.FindEntityType(typeof(T))?.FindPrimaryKey()?.Properties.Select(x => x.Name).SingleOrDefault();
+
+            if (keyName == null)
+                throw new InvalidOperationException("No primary key defined for the entity.");
+
+            var keyValue = typeof(T).GetProperty(keyName)?.GetValue(entity);
+
+            if (keyValue == null)
+                throw new InvalidOperationException("The primary key value is null.");
+
+            var existingEntity = await _context.Set<T>().FindAsync(keyValue);
+
+            if (existingEntity == null)
+                return null;
+
+            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return existingEntity;
         }
 
         public async Task DeleteAsync(int id)

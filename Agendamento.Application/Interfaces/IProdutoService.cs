@@ -2,10 +2,9 @@ using Agendamento.Application.DTOs;
 
 namespace Agendamento.Application.Interfaces
 {
-    public interface IProdutoService : IGenericService<ProdutoDTO, ProdutoUpdateDTO>
+    public interface IProdutoService : IGenericService<ProdutoDTO>
     {
-        Task<IEnumerable<ProdutoFotoDTO>> GetAllAsync();
-        Task FinalizarProdutoAsync(int produtoId);
+        Task PublishProductAsync(int produtoId);
         Task AddFotoToProdutoAsync(int produtoId, FotoDTO fotoDto);
         Task UpdateStatusProdutoAsync(int id, bool isActive);
         Task<IEnumerable<ProdutoDTO>> GetProdutoByCategoriaIdAsync(int? id);

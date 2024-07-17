@@ -1,143 +1,30 @@
 using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
-using Agendamento.Domain.Exceptions;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamento.WebAPI.Controllers
 {
-    [Route("[controller]")]
-    public class CategoriaController : ControllerBase
+    [Route("api/[controller]")]
+    public class CategoriaController : GenericController<ICategoriaService, CategoriaDTO>
     {
-        private readonly ICategoriaService _categoriaService;
-
-        public CategoriaController(ICategoriaService categoriaService)
-        {
-            _categoriaService = categoriaService ?? throw new ArgumentNullException(nameof(categoriaService));
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<CategoriaDTO>> Add([FromBody] CategoriaDTO categoriaDto)
-        {
-            try
-            {
-                var result = await _categoriaService.AddAsync(categoriaDto);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-            }
-            catch (ValidationException ex)
-            {
-                var errorMessages = ex.Errors.Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { messages = errorMessages });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
-            }
-        }
+        public CategoriaController(ICategoriaService categoriaService) : base(categoriaService)
+        { }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoriaActiveDTO>>> GetAll()
         {
-            try
-            {
-                var categorias = await _categoriaService.GetAllAsync();
-                return Ok(categorias);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
-            }
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CategoriaDTO>> GetById(int id)
-        {
-            try
-            {
-                var categoria = await _categoriaService.GetByIdAsync(id);
-                return Ok(categoria);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Ocorreu um erro interno.");
-            }
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult<CategoriaDTO>> Update(int id, [FromBody] CategoriaUpdateDTO categoriaDto)
-        {
-            try
-            {
-                var categoria = await _categoriaService.UpdateAsync(categoriaDto);
-                return Ok(categoria);
-            }
-            catch (ValidationException ex)
-            {
-                var errorMessages = ex.Errors.Select(error => error.ErrorMessage).ToList();
-
-                return BadRequest(new { messages = errorMessages });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            try
-            {
-                var categoria = await _categoriaService.GetByIdAsync(id); if (categoria == null)
-                    await _categoriaService.DeleteAsync(id);
-                return NoContent();
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
-            }
+            return await GetAllCustom<CategoriaActiveDTO>();
         }
 
         [HttpPost("{id}/status")]
-        public async Task<ActionResult> UpdateStatus(int id, [FromQuery] bool status)
+        public async Task<ActionResult> Disable(int id, [FromQuery] bool status)
         {
-            try
-            {
-                await _categoriaService.UpdateStatusAsync(id, status);
-                return NoContent();
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
-            }
+            var categoriaDto = await _service.GetByIdAsync(id);
+            if (categoriaDto == null)
+                return NotFound($"Categoria com Id {id} não encontrado.");
+
+            await _service.UpdateStatusCategoriaAsync(id, status);
+            return NoContent();
         }
     }
 }

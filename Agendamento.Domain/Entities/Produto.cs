@@ -20,14 +20,8 @@ namespace Agendamento.Domain.Entities
 
         public Produto(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
-            Nome = nome;
-            Preco = preco;
-            Descricao = descricao;
-            CategoriaId = categoriaId;
-            FotoPrincipalId = fotoPrincipalId;
-            FotoPrincipal = fotoPrincipal;
-
-            ValidaExcessoes();
+            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
+            ValidateExceptions();
         }
 
         public Produto(int id, string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
@@ -35,26 +29,14 @@ namespace Agendamento.Domain.Entities
             DomainValidationException.When(id < 0, "Valor de Id é inválido");
 
             Id = id;
-            Nome = nome;
-            Preco = preco;
-            Descricao = descricao;
-            CategoriaId = categoriaId;
-            FotoPrincipalId = fotoPrincipalId;
-            FotoPrincipal = fotoPrincipal;
-
-            ValidaExcessoes();
+            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
+            ValidateExceptions();
         }
 
         public void Update(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
-            Nome = nome;
-            Preco = preco;
-            Descricao = descricao;
-            CategoriaId = categoriaId;
-            FotoPrincipalId = fotoPrincipalId;
-            FotoPrincipal = fotoPrincipal;
-
-            ValidaExcessoes();
+            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
+            ValidateExceptions();
         }
 
         public void SetFotoPrincipal(Foto foto)
@@ -68,7 +50,19 @@ namespace Agendamento.Domain.Entities
             IsActive = false;
         }
 
-        private void ValidaExcessoes()
+        private void InitialValue(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
+        {
+            Nome = nome;
+            Preco = preco;
+            Descricao = descricao;
+            CategoriaId = categoriaId;
+            FotoPrincipalId = fotoPrincipalId;
+            FotoPrincipal = fotoPrincipal;
+
+            ValidateExceptions();
+        }
+
+        private void ValidateExceptions()
         {
             DomainValidationException.When(string.IsNullOrEmpty(Nome), "Nome é obrigatório");
             DomainValidationException.When(Nome.Length < 3, "Nome deve ter no mínimo 3 caracteres");

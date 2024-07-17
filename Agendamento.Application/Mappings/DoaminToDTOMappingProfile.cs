@@ -9,6 +9,7 @@ namespace Agendamento.Application.Mappings
         public DomainToDTOMappingProfile()
         {
             CreateMap<Categoria, CategoriaDTO>().ReverseMap();
+            CreateMap<Categoria, CategoriaActiveDTO>().ReverseMap();
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
             CreateMap<Produto, ProdutoFotoDTO>()
              .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal != null ? new FotoDTO
@@ -16,9 +17,9 @@ namespace Agendamento.Application.Mappings
                  Id = src.FotoPrincipal.Id,
                  Url = src.FotoPrincipal.Url,
                  FilePath = src.FotoPrincipal.FilePath,
+                 IsPrincipal = src.FotoPrincipal.IsPrincipal,
                  ProdutoId = src.Id
              } : null));
-            CreateMap<Produto, ProdutoUpdateDTO>().ReverseMap();
             CreateMap<Cliente, ClienteDTO>().ReverseMap();
             CreateMap<ClienteEmpresa, ClienteEmpresaDTO>().ReverseMap();
             CreateMap<EmpresaCliente, EmpresaClienteDTO>().ReverseMap();

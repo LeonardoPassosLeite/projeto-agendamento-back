@@ -5,33 +5,21 @@ using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace Agendamento.Application.Services
 {
-    public class ProdutoService : GenericService<Produto, ProdutoDTO, ProdutoUpdateDTO>, IProdutoService
+    public class ProdutoService : GenericService<Produto, ProdutoDTO>, IProdutoService
     {
         private readonly IProdutoRepository _produtoRepository;
 
-        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> validatorProduto, IValidator<ProdutoUpdateDTO> validatorProdutoActive)
-            : base(produtoRepository, mapper, validatorProduto, validatorProdutoActive)
+        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> validatorProduto)
+            : base(produtoRepository, mapper, validatorProduto)
         {
             _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
         }
 
-        public async Task<IEnumerable<ProdutoFotoDTO>> GetAllAsync()
-        {
-            try
-            {
-                var produtoEntities = await _produtoRepository.GetAllAsync();
-                return _mapper.Map<IEnumerable<ProdutoFotoDTO>>(produtoEntities);
-            }
-            catch (DatabaseException ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao buscar os produtos", ex);
-            }
-        }
-
-        public async Task FinalizarProdutoAsync(int produtoId)
+        public async Task PublishProductAsync(int produtoId)
         {
             var produtoEntity = await _produtoRepository.GetByIdAsync(produtoId);
 
@@ -53,13 +41,11 @@ namespace Agendamento.Application.Services
 
             if (produto.FotoPrincipalId != null && produto.FotoPrincipalId == foto.Id)
                 produto.FotoPrincipal = foto;
-
             else
                 produto.SetFotoPrincipal(foto);
 
             await _produtoRepository.UpdateAsync(produto);
-
-            await FinalizarProdutoAsync(produtoId);
+            await PublishProductAsync(produtoId);
         }
 
         public async Task UpdateStatusProdutoAsync(int id, bool isActive)
@@ -72,11 +58,10 @@ namespace Agendamento.Application.Services
                 var produtoEntity = await _produtoRepository.GetByIdAsync(id);
                 if (produtoEntity == null)
                 {
-                    throw new NotFoundException($"Produto com Id {id} não encontrada.");
+                    throw new NotFoundException($"Produto com Id {id} não encontrado.");
                 }
 
                 produtoEntity.IsActive = isActive;
-
                 await _produtoRepository.UpdateAsync(produtoEntity);
             }
             catch (NotFoundException ex)
@@ -105,6 +90,42 @@ namespace Agendamento.Application.Services
             catch (DatabaseException ex)
             {
                 throw new ApplicationException($"Ocorreu um erro ao obter os produtos da categoria com id {id}", ex);
+            }
+        }
+
+        public override async Task<ProdutoDTO> UpdateAsync(ProdutoDTO produtoDto)
+        {
+            if (produtoDto == null)
+                throw new ValidationException("DTO não pode ser nulo.");
+
+
+            ValidationResult validationResult = await _validator.ValidateAsync(produtoDto);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            try
+            {
+                var produto = await _produtoRepository.GetByIdAsync(produtoDto.Id);
+                if (produto == null)
+                    throw new NotFoundException($"Produto com Id {produtoDto.Id} não encontrado.");
+
+                if (produto.FotoPrincipal == null)
+                    throw new ConflictException("Não é possivel editar um produto sem uma foto principal");
+
+
+                var fotoPrincipal = produto.FotoPrincipal;
+
+                _mapper.Map(produtoDto, produto);
+                produto.FotoPrincipal = fotoPrincipal;
+                produto.IsRascunho = false;
+
+                var updatedProduto = await _produtoRepository.UpdateAsync(produto);
+                return _mapper.Map<ProdutoFotoDTO>(updatedProduto);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao atualizar o produto.", ex);
             }
         }
     }

@@ -11,9 +11,9 @@ namespace Agendamento.Infrastructure.Repositories
         public FotoRepository(ApplicationDbContext context) : base(context)
         { }
 
-        public async Task<bool> FotoPrincipalExisteAsync(int produtoId)
+        public async Task<bool> FotoPrincipalExistAsync(int produtoId)
         {
-            return await _context.Fotos.AnyAsync(f => f.ProdutoId == produtoId && f.IsPrincial);
+            return await _context.Fotos.AnyAsync(f => f.ProdutoId == produtoId && f.IsPrincipal);
         }
     }
 }

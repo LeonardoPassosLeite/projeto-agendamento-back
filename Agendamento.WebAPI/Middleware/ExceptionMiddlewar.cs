@@ -1,5 +1,7 @@
 using Agendamento.Domain.Exceptions;
+using FluentValidation;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace Agendamento.WebAPI.Middleware
@@ -30,20 +32,41 @@ namespace Agendamento.WebAPI.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = exception switch
             {
-                DomainValidationException => (int)HttpStatusCode.Conflict,
-                NotFoundException => (int)HttpStatusCode.NotFound,
-                DatabaseException => (int)HttpStatusCode.InternalServerError,
-                _ => (int)HttpStatusCode.InternalServerError,
+                DomainValidationException _ => (int)HttpStatusCode.BadRequest,
+                ValidationException _ => (int)HttpStatusCode.BadRequest,
+                NotFoundException _ => (int)HttpStatusCode.NotFound,
+                ConflictException _ => (int)HttpStatusCode.Conflict,
+                DatabaseException _ => (int)HttpStatusCode.InternalServerError,
+                _ => (int)HttpStatusCode.InternalServerError
             };
+
+            var message = exception is ValidationException validationException
+                ? FormatValidationErrors(validationException)
+                : exception.Message;
 
             var response = new
             {
-                context.Response.StatusCode,
-                Message = exception.Message ?? "An error occurred."
+                StatusCode = context.Response.StatusCode,
+                Message = message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ")
             };
 
-            var responseText = JsonSerializer.Serialize(response);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            var responseText = JsonSerializer.Serialize(response, options);
             return context.Response.WriteAsync(responseText);
+        }
+
+        private static string FormatValidationErrors(ValidationException validationException)
+        {
+            var sb = new StringBuilder();
+            foreach (var error in validationException.Errors)
+            {
+                sb.AppendLine($"{error.PropertyName}: {error.ErrorMessage}");
+            }
+            return sb.ToString().Trim();
         }
     }
 }

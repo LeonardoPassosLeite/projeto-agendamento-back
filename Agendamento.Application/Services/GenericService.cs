@@ -1,23 +1,22 @@
-using System.Linq.Expressions;
+using Agendamento.Application.DTOs.Commons;
+using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 
-public class GenericService<TEntity, TDto, TUpdateDto> where TEntity : class
+public class GenericService<TEntity, TDto> : IGenericService<TDto> where TEntity : class where TDto : BaseDTO
 {
     protected readonly IGenericRepository<TEntity> _repository;
     protected readonly IMapper _mapper;
     protected readonly IValidator<TDto> _validator;
-    protected readonly IValidator<TUpdateDto> _updateValidator;
 
-    public GenericService(IGenericRepository<TEntity> repository, IMapper mapper, IValidator<TDto> validator, IValidator<TUpdateDto> updateValidator)
+    public GenericService(IGenericRepository<TEntity> repository, IMapper mapper, IValidator<TDto> validator)
     {
         _repository = repository;
         _mapper = mapper;
         _validator = validator;
-        _updateValidator = updateValidator;
     }
 
     public async Task<TDto> AddAsync(TDto dto)
@@ -42,17 +41,10 @@ public class GenericService<TEntity, TDto, TUpdateDto> where TEntity : class
         }
     }
 
-    public async Task<IEnumerable<TDto>> GetAllAsync(Expression<Func<TEntity, object>>? orderBy = null)
+    public async Task<IEnumerable<TResponseDto>> GetAllAsync<TResponseDto>() where TResponseDto : class
     {
-        try
-        {
-            var entities = await _repository.GetAllAsync(orderBy);
-            return _mapper.Map<IEnumerable<TDto>>(entities);
-        }
-        catch (DatabaseException ex)
-        {
-            throw new ApplicationException("Ocorreu um erro ao buscar as entidades", ex);
-        }
+        var entities = await _repository.GetAllAsync();
+        return _mapper.Map<IEnumerable<TResponseDto>>(entities);
     }
 
     public async Task<TDto> GetByIdAsync(int id)
@@ -74,12 +66,12 @@ public class GenericService<TEntity, TDto, TUpdateDto> where TEntity : class
         }
     }
 
-    public async Task<TDto> UpdateAsync(TUpdateDto dto)
+    public virtual async Task<TDto> UpdateAsync(TDto dto)
     {
         if (dto == null)
             throw new ValidationException("DTO não pode ser nulo.");
 
-        ValidationResult validationResult = await _updateValidator.ValidateAsync(dto);
+        ValidationResult validationResult = await _validator.ValidateAsync(dto);
 
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
@@ -87,8 +79,11 @@ public class GenericService<TEntity, TDto, TUpdateDto> where TEntity : class
         try
         {
             var entity = _mapper.Map<TEntity>(dto);
-            await _repository.UpdateAsync(entity);
-            return _mapper.Map<TDto>(entity);
+            var updatedEntity = await _repository.UpdateAsync(entity);
+            if (updatedEntity == null)
+                throw new NotFoundException($"Entidade com Id {dto.Id} não encontrada.");
+
+            return _mapper.Map<TDto>(updatedEntity);
         }
         catch (DatabaseException ex)
         {
@@ -103,6 +98,10 @@ public class GenericService<TEntity, TDto, TUpdateDto> where TEntity : class
 
         try
         {
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+                throw new NotFoundException($"Entidade com Id {id} não encontrada.");
+
             await _repository.DeleteAsync(id);
         }
         catch (DatabaseException ex)

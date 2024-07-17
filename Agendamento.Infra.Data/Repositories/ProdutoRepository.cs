@@ -25,6 +25,13 @@ namespace Agendamento.Infra.Data.Repositories
             return await query.ToListAsync();
         }
 
+        public override async Task<Produto?> GetByIdAsync(int id)
+        {
+            return await _produtoContext.Produtos
+                    .Include(p => p.FotoPrincipal)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         public async Task DisableAsync(Produto produto)
         {
             _produtoContext.Produtos.Remove(produto);

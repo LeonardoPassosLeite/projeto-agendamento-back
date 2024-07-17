@@ -28,9 +28,9 @@ namespace Agendamento.Application.Services
 
             var fotoEntity = _mapper.Map<Foto>(fotoDto);
 
-            if (fotoEntity.IsPrincial)
+            if (fotoEntity.IsPrincipal)
             {
-                var fotoPrincipalExist = await _fotoRepository.FotoPrincipalExisteAsync(fotoEntity.ProdutoId);
+                var fotoPrincipalExist = await _fotoRepository.FotoPrincipalExistAsync(fotoEntity.ProdutoId);
                 if (fotoPrincipalExist)
                     throw new DomainValidationException("O produto já possui uma foto principal.");
             }

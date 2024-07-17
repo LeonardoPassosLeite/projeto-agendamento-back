@@ -4,9 +4,9 @@ namespace Agendamento.Domain.Entities
 {
     public sealed class Foto : BaseEntity
     {
-        public string? Url { get; private set; }
-        public string? FilePath { get; private set; }
-        public bool IsPrincial { get; private set; } = true;
+        public string? Url { get; set; }
+        public string? FilePath { get; set; }
+        public bool IsPrincipal { get; private set; } = true;
         public int ProdutoId { get; set; }
         public required Produto Produto { get; set; }
 
@@ -16,7 +16,7 @@ namespace Agendamento.Domain.Entities
             FilePath = filePath;
             ProdutoId = produtoId;
 
-            ValidaExcessoes();
+            ValidateExceptions();
         }
 
         public Foto(int id, string? url, string? filePath, int produtoId)
@@ -28,15 +28,15 @@ namespace Agendamento.Domain.Entities
             FilePath = filePath;
             ProdutoId = produtoId;
 
-            ValidaExcessoes();
+            ValidateExceptions();
         }
 
-        public void SetPrincipal(bool isPrincial)
+        public void SetPrincipal(bool isPrincipal)
         {
-            IsPrincial = isPrincial;
+            IsPrincipal = isPrincipal;
         }
 
-        private void ValidaExcessoes()
+        private void ValidateExceptions()
         {
             DomainValidationException.When(string.IsNullOrEmpty(Url) && string.IsNullOrEmpty(FilePath), "URL ou Caminho do arquivo devem ser fornecidos");
             DomainValidationException.When(!string.IsNullOrEmpty(Url) && Url.Length < 5, "URL deve ter no mínimo 5 caracteres");

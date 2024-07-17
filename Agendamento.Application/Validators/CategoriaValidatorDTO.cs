@@ -13,15 +13,4 @@ namespace Agendamento.Application.Validators
                 .MaximumLength(100).WithMessage("O Nome deve ter no máximo 100 caracteres");
         }
     }
-
-    public class CategoriaUpdateDTOValidator : AbstractValidator<CategoriaUpdateDTO>
-    {
-        public CategoriaUpdateDTOValidator()
-        {
-            RuleFor(x => x.Nome)
-                .NotEmpty().WithMessage("O Nome é obrigatório")
-                .MinimumLength(3).WithMessage("O Nome deve ter no mínimo 3 caracteres")
-                .MaximumLength(100).WithMessage("O Nome deve ter no máximo 100 caracteres");
-        }
-    }
 }
