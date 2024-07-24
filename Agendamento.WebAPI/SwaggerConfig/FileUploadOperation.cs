@@ -1,27 +1,47 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-public class FileUploadOperation : IOperationFilter
+namespace Agendamento.WebAPI.Swagger
 {
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public class FileUploadOperation : IOperationFilter
     {
-        var fileUploadMime = context.MethodInfo.GetCustomAttributes(true).OfType<ConsumesAttribute>().Any(x => x.ContentTypes.Contains("multipart/form-data"));
-        if (!fileUploadMime) return;
-
-        operation.Parameters ??= new List<OpenApiParameter>();
-
-        operation.Parameters.Add(new OpenApiParameter
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            Name = "file",
-            In = ParameterLocation.Header,
-            Description = "Upload Image",
-            Required = true,
-            Schema = new OpenApiSchema
+            var uploadFileParameters = context.MethodInfo.GetParameters()
+                .Where(p => p.ParameterType == typeof(IFormFile))
+                .ToList();
+
+            if (uploadFileParameters.Any())
             {
-                Type = "string",
-                Format = "binary"
+                operation.Parameters = new List<OpenApiParameter>();
+
+                foreach (var fileParameter in uploadFileParameters)
+                {
+                    operation.Parameters.Add(new OpenApiParameter
+                    {
+                        Name = fileParameter.Name,
+                        In = ParameterLocation.Header,
+                        Description = "Upload File",
+                        Required = true,
+                        Schema = new OpenApiSchema { Type = "file" }
+                    });
+                }
+
+                operation.RequestBody = new OpenApiRequestBody
+                {
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        ["multipart/form-data"] = new OpenApiMediaType
+                        {
+                            Schema = new OpenApiSchema
+                            {
+                                Type = "object",
+                                Properties = uploadFileParameters.ToDictionary(p => p.Name, p => new OpenApiSchema { Type = "string", Format = "binary" })
+                            }
+                        }
+                    }
+                };
             }
-        });
+        }
     }
 }

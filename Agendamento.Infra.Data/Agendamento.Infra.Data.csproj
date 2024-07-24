@@ -2,9 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agendamento.Domain\Agendamento.Domain.csproj" />
+      <ProjectReference Include="..\Agendamento.Application\Agendamento.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FirebaseAdmin" Version="2.2.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="3.6.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -6,20 +6,23 @@ namespace Agendamento.Domain.Entities
     {
         public string? Url { get; set; }
         public string? FilePath { get; set; }
-        public bool IsPrincipal { get; private set; } = true;
+        public bool IsPrincipal { get; set; }
         public int ProdutoId { get; set; }
         public required Produto Produto { get; set; }
 
-        public Foto(string? url, string? filePath, int produtoId)
+        public Foto() { }
+
+        public Foto(string? url, string? filePath, int produtoId, Produto produto)
         {
             Url = url;
             FilePath = filePath;
             ProdutoId = produtoId;
+            Produto = produto;
 
             ValidateExceptions();
         }
 
-        public Foto(int id, string? url, string? filePath, int produtoId)
+        public Foto(int id, string? url, string? filePath, int produtoId, Produto produto)
         {
             DomainValidationException.When(id < 0, "Valor de Id é inválido");
 
@@ -27,12 +30,20 @@ namespace Agendamento.Domain.Entities
             Url = url;
             FilePath = filePath;
             ProdutoId = produtoId;
+            Produto = produto;
 
             ValidateExceptions();
         }
 
-        public void SetPrincipal(bool isPrincipal)
+        public void SetId(int id)
         {
+            Id = id;
+        }
+
+        public void SetFileProperties(string url, string filePath, bool isPrincipal = true)
+        {
+            Url = url;
+            FilePath = filePath;
             IsPrincipal = isPrincipal;
         }
 

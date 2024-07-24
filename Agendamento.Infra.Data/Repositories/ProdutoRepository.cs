@@ -19,9 +19,8 @@ namespace Agendamento.Infra.Data.Repositories
         {
             var query = _produtoContext.Produtos.Include(p => p.FotoPrincipal).AsQueryable();
             if (orderBy != null)
-            {
                 query = query.OrderBy(orderBy);
-            }
+
             return await query.ToListAsync();
         }
 

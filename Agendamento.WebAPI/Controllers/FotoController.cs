@@ -2,47 +2,28 @@ using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Agendamento.Web.Controllers
+namespace Agendamento.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FotosController : ControllerBase
+    public class FotoController : ControllerBase
     {
         private readonly IFotoService _fotoService;
-        private readonly IWebHostEnvironment _env;
+        private readonly IProdutoService _produtoService;
 
-        public FotosController(IFotoService fotoService, IWebHostEnvironment env)
+        public FotoController(IFotoService fotoService, IProdutoService produtoService)
         {
             _fotoService = fotoService;
-            _env = env;
+            _produtoService = produtoService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<FotoDTO>> AddFoto([FromBody] FotoDTO fotoDto)
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFile([FromForm] FotoUploadDTO fotoUploadDto)
         {
-            if (fotoDto == null)
-                return BadRequest("Foto não pode ser nula.");
+            var fotoDto = await _fotoService.UploadFileAsync(fotoUploadDto);
+            await _produtoService.AddFotoToProdutoAsync(fotoUploadDto.ProdutoId, fotoDto);
 
-            var foto = await _fotoService.AddFotoAsync(fotoDto);
-            return CreatedAtAction(nameof(GetFotoById), new { id = foto.Id }, foto);
-        }
-
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult<FotoDTO>> Update(int id, [FromBody] FotoDTO fotoDto)
-        {
-            if (id != fotoDto.Id)
-                return BadRequest("ID inválido");
-
-            var result = await _fotoService.UpdateFotoAsync(fotoDto);
-            return Ok(result);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetFotoById(int id)
-        {
-            var foto = await _fotoService.GetFotoByIdAsync(id);
-            return Ok(foto);
+            return Ok(new { Id = fotoDto.Id, Url = fotoDto.Url });
         }
     }
 }

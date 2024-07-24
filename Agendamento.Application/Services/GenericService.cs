@@ -41,7 +41,7 @@ public class GenericService<TEntity, TDto> : IGenericService<TDto> where TEntity
         }
     }
 
-    public async Task<IEnumerable<TResponseDto>> GetAllAsync<TResponseDto>() where TResponseDto : class
+    public virtual async Task<IEnumerable<TResponseDto>> GetAllAsync<TResponseDto>() where TResponseDto : class
     {
         var entities = await _repository.GetAllAsync();
         return _mapper.Map<IEnumerable<TResponseDto>>(entities);

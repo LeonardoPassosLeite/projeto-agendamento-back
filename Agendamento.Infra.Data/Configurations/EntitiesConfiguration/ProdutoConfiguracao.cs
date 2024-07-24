@@ -36,6 +36,32 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                               IsRascunho = true,
                               DataCriacao = DateTime.UtcNow,
                               DataAtualizacao = DateTime.UtcNow
+                          },
+                          new
+                          {
+                              Id = 2,
+                              Nome = "Produto 2",
+                              Preco = 200.00M,
+                              Descricao = "Descrição Produto",
+                              CategoriaId = 1,
+                              FotoPrincipalId = (int?)null,
+                              IsActive = true,
+                              IsRascunho = true,
+                              DataCriacao = DateTime.UtcNow,
+                              DataAtualizacao = DateTime.UtcNow
+                          },
+                          new
+                          {
+                              Id = 3,
+                              Nome = "Produto 3",
+                              Preco = 300.00M,
+                              Descricao = "Descrição Produto",
+                              CategoriaId = 2,
+                              FotoPrincipalId = (int?)null,
+                              IsActive = true,
+                              IsRascunho = true,
+                              DataCriacao = DateTime.UtcNow,
+                              DataAtualizacao = DateTime.UtcNow
                           }
                       );
         }

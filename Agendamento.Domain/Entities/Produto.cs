@@ -16,7 +16,7 @@ namespace Agendamento.Domain.Entities
         public bool IsActive { get; set; } = true;
         public bool IsRascunho { get; set; } = true;
 
-        private Produto() { }
+        public Produto() { }
 
         public Produto(int id, string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
         {
@@ -31,20 +31,25 @@ namespace Agendamento.Domain.Entities
             InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
         }
 
-        public void Update(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)
+       public void Update(string nome, decimal preco, string? descricao, int categoriaId)
         {
-            InitialValue(nome, preco, descricao, categoriaId, fotoPrincipalId, fotoPrincipal);
+            Nome = nome;
+            Preco = preco;
+            Descricao = descricao;
+            CategoriaId = categoriaId;
+            IsRascunho = false;
         }
 
         public void SetFotoPrincipal(Foto foto)
         {
             FotoPrincipal = foto;
             FotoPrincipalId = foto.Id;
+            IsRascunho = false;
         }
 
-        public void Disable()
+        public void ToggleAcitve()
         {
-            IsActive = false;
+            IsActive = !IsActive;
         }
 
         private void InitialValue(string nome, decimal preco, string? descricao, int categoriaId, int? fotoPrincipalId, Foto? fotoPrincipal = null)

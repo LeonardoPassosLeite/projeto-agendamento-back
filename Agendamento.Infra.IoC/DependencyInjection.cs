@@ -15,22 +15,33 @@ namespace Agendamento.Infra.IoC
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructures(this IServiceCollection services,
-        IConfiguration configuration)
+        public static IServiceCollection AddInfrastructures(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
+            // Repositories
             services.AddScoped<ICategoriaRepository, CategoriaRepository>();
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IFotoRepository, FotoRepository>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+            // Use Cases
+            services.AddScoped<AddFotoToProduto>();
+            services.AddScoped<UpdateStatusProduto>();
+            services.AddScoped<GetProdutoByCategoriaId>();
+            services.AddScoped<UpdateProduto>();
+
+            // Services
             services.AddScoped<ICategoriaService, CategoriaService>();
             services.AddScoped<IProdutoService, ProdutoService>();
             services.AddScoped<IFotoService, FotoService>();
+
+            // AutoMapper
             services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 
+            // FluentValidation
             services.AddValidatorsFromAssemblyContaining<ProdutoDTOValidator>();
 
             return services;

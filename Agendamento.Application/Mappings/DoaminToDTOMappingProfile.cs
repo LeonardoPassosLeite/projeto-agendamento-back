@@ -12,17 +12,12 @@ namespace Agendamento.Application.Mappings
             CreateMap<Categoria, CategoriaActiveDTO>().ReverseMap();
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
             CreateMap<Produto, ProdutoFotoDTO>()
-             .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal != null ? new FotoDTO
-             {
-                 Id = src.FotoPrincipal.Id,
-                 Url = src.FotoPrincipal.Url,
-                 FilePath = src.FotoPrincipal.FilePath,
-                 ProdutoId = src.Id
-             } : null));
+                .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
             CreateMap<Cliente, ClienteDTO>().ReverseMap();
             CreateMap<ClienteEmpresa, ClienteEmpresaDTO>().ReverseMap();
             CreateMap<EmpresaCliente, EmpresaClienteDTO>().ReverseMap();
             CreateMap<Foto, FotoDTO>().ReverseMap();
+            CreateMap<Foto, FotoUploadDTO>().ReverseMap();
         }
     }
 }

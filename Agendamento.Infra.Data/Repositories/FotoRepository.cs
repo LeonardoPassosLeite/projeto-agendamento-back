@@ -15,5 +15,6 @@ namespace Agendamento.Infrastructure.Repositories
         {
             return await _context.Fotos.AnyAsync(f => f.ProdutoId == produtoId && f.IsPrincipal);
         }
+        
     }
 }

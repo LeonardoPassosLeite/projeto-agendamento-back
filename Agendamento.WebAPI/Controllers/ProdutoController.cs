@@ -13,7 +13,8 @@ namespace Agendamento.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProdutoFotoDTO>>> GetAllWithFoto()
         {
-            return await GetAllCustom<ProdutoFotoDTO>();
+            var produtos = await _service.GetAllProdutoFotosAsync();
+            return Ok(produtos);
         }
 
         [HttpGet("categoria/{categoriaId}")]
