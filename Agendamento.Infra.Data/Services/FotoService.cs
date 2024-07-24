@@ -16,16 +16,16 @@ public class FotoService : IFotoService
     private readonly IFotoRepository _fotoRepository;
     private readonly IProdutoRepository _produtoRepository;
     private readonly IMapper _mapper;
-    private readonly IValidator<FotoDTO> _validator;
+    private readonly IValidator<FotoUploadDTO> _validator;
 
-    public FotoService(IConfiguration configuration, IFotoRepository fotoRepository, IProdutoRepository produtoRepository, IMapper mapper, IValidator<FotoDTO> validator)
+    public FotoService(IConfiguration configuration, IFotoRepository fotoRepository, IProdutoRepository produtoRepository, IMapper mapper, IValidator<FotoUploadDTO> validator)
     {
         _storageClient = StorageClient.Create();
-        _bucketName = configuration["Firebase:BucketName"];
-        _fotoRepository = fotoRepository;
-        _produtoRepository = produtoRepository;
-        _mapper = mapper;
-        _validator = validator;
+        _bucketName = configuration["Firebase:BucketName"] ?? throw new ArgumentNullException(nameof(configuration));
+        _fotoRepository = fotoRepository ?? throw new ArgumentNullException(nameof(fotoRepository));
+        _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
     public async Task<FotoDTO> UploadFileAsync(FotoUploadDTO fotoUploadDto)
@@ -33,12 +33,17 @@ public class FotoService : IFotoService
         if (fotoUploadDto == null)
             throw new ValidationException("DTO não pode ser nulo.");
 
+        ValidationResult validationResult = await _validator.ValidateAsync(fotoUploadDto);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
         string filePath;
         string url;
 
         if (fotoUploadDto.File != null)
         {
             var fileName = fotoUploadDto.File.FileName;
+  
             filePath = $"https://firebasestorage.googleapis.com/v0/b/{_bucketName}/o/{fileName}?alt=media";
 
             using (var stream = fotoUploadDto.File.OpenReadStream())
