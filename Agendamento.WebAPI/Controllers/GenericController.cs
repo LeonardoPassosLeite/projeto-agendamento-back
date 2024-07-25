@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Agendamento.Application.Interfaces;
 using Agendamento.Application.DTOs.Commons;
+using Agendamento.Application.Helpers;
 
 namespace Agendamento.WebAPI.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public abstract class GenericController<TService, TDto> : ControllerBase
         where TService : IGenericService<TDto>
         where TDto : BaseDTO
@@ -22,11 +25,11 @@ namespace Agendamento.WebAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        [HttpGet("custom")]
-        public async Task<ActionResult<IEnumerable<TResponseDto>>> GetAllCustom<TResponseDto>() where TResponseDto : class
+        [HttpGet("paged")]
+        public virtual async Task<ActionResult<PagedResultDTO<TDto>>> GetPaged([FromQuery] PaginationParams paginationParams)
         {
-            var items = await _service.GetAllAsync<TResponseDto>();
-            return Ok(items);
+            var result = await _service.GetPagedAsync(paginationParams);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]

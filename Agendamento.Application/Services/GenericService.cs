@@ -1,4 +1,5 @@
 using Agendamento.Application.DTOs.Commons;
+using Agendamento.Application.Helpers;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
@@ -41,10 +42,28 @@ public class GenericService<TEntity, TDto> : IGenericService<TDto> where TEntity
         }
     }
 
-    public virtual async Task<IEnumerable<TResponseDto>> GetAllAsync<TResponseDto>() where TResponseDto : class
+    public virtual async Task<PagedResultDTO<TDto>> GetPagedAsync(PaginationParams paginationParams)
     {
-        var entities = await _repository.GetAllAsync();
-        return _mapper.Map<IEnumerable<TResponseDto>>(entities);
+        if (paginationParams == null)
+            throw new ValidationException("Parâmetros de paginação não podem ser nulos.");
+
+        try
+        {
+            var pagedResult = await _repository.GetPagedAsync(
+                filter: null,
+                page: paginationParams.Page,
+                pageSize: paginationParams.PageSize,
+                filterText: paginationParams.Filter
+            );
+
+            var itemsDto = _mapper.Map<IEnumerable<TDto>>(pagedResult.Items);
+
+            return new PagedResultDTO<TDto>(itemsDto, pagedResult.TotalCount);
+        }
+        catch (DatabaseException ex)
+        {
+            throw new ApplicationException("Ocorreu um erro ao obter a paginação.", ex);
+        }
     }
 
     public async Task<TDto> GetByIdAsync(int id)

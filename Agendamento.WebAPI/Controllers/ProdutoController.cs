@@ -1,4 +1,5 @@
 using Agendamento.Application.DTOs;
+using Agendamento.Application.Helpers;
 using Agendamento.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +11,11 @@ namespace Agendamento.WebAPI.Controllers
         public ProdutoController(IProdutoService produtoService) : base(produtoService)
         { }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProdutoFotoDTO>>> GetAllWithFoto()
+        [HttpGet("pageds")]
+        public async Task<IActionResult> GetPageds([FromQuery] PaginationParams paginationParams)
         {
-            var produtos = await _service.GetAllProdutoFotosAsync();
-            return Ok(produtos);
+            var result = await _service.GetPagedProdutosAsync(paginationParams);
+            return Ok(result);
         }
 
         [HttpGet("categoria/{categoriaId}")]

@@ -5,16 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace Agendamento.WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController] 
     public class CategoriaController : GenericController<ICategoriaService, CategoriaDTO>
     {
         public CategoriaController(ICategoriaService categoriaService) : base(categoriaService)
         { }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoriaActiveDTO>>> GetAll()
-        {
-            return await GetAllCustom<CategoriaActiveDTO>();
-        }
 
         [HttpPost("{id}/status")]
         public async Task<ActionResult> Disable(int id, [FromQuery] bool status)

@@ -1,6 +1,8 @@
 using Agendamento.Application.DTOs;
+using Agendamento.Application.Helpers;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Entities;
+using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
@@ -31,10 +33,27 @@ public class ProdutoService : GenericService<Produto, ProdutoDTO>, IProdutoServi
         _getProdutoByCategoriaId = getProdutoByCategoriaId;
     }
 
-    public async Task<IEnumerable<ProdutoFotoDTO>> GetAllProdutoFotosAsync()
+    public async Task<PagedResultDTO<ProdutoFotoDTO>> GetPagedProdutosAsync(PaginationParams paginationParams)
     {
-        var produtos = await _produtoRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<ProdutoFotoDTO>>(produtos);
+        if (paginationParams == null)
+            throw new ValidationException("Parâmetros de paginação não podem ser nulos.");
+
+        try
+        {
+            var pagedResult = await _produtoRepository.GetPagedAsync(
+                page: paginationParams.Page,
+                pageSize: paginationParams.PageSize,
+                filterText: paginationParams.Filter
+            );
+
+            var produtoDtos = _mapper.Map<IEnumerable<ProdutoFotoDTO>>(pagedResult.Items);
+
+            return new PagedResultDTO<ProdutoFotoDTO>(produtoDtos, pagedResult.TotalCount);
+        }
+        catch (DatabaseException ex)
+        {
+            throw new ApplicationException("Ocorreu um erro ao obter a paginação.", ex);
+        }
     }
 
     public override async Task<ProdutoDTO> UpdateAsync(ProdutoDTO dto)

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Agendamento.Application.Helpers;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
@@ -10,18 +11,27 @@ namespace Agendamento.Infra.Data.Repositories
     {
         private readonly ApplicationDbContext _produtoContext;
 
-        public ProdutoRepository(ApplicationDbContext prdutoContext) : base(prdutoContext)
+        public ProdutoRepository(ApplicationDbContext produtoContext) : base(produtoContext)
         {
-            _produtoContext = prdutoContext;
+            _produtoContext = produtoContext;
         }
 
-        public override async Task<IEnumerable<Produto>> GetAllAsync(Expression<Func<Produto, object>>? orderBy = null)
+        public async Task<(IEnumerable<Produto> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? filterText)
         {
-            var query = _produtoContext.Produtos.Include(p => p.FotoPrincipal).AsQueryable();
-            if (orderBy != null)
-                query = query.OrderBy(orderBy);
+            IQueryable<Produto> query = _produtoContext.Produtos
+                .Include(p => p.FotoPrincipal);
 
-            return await query.ToListAsync();
+            if (!string.IsNullOrWhiteSpace(filterText))
+                query = query.Where(p => EF.Functions.Like(EF.Property<string>(p, "Nome").ToLower(), $"%{filterText.ToLower()}%"));
+
+            int totalCount = await query.CountAsync();
+
+            var produtos = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (produtos, totalCount);
         }
 
         public override async Task<Produto?> GetByIdAsync(int id)

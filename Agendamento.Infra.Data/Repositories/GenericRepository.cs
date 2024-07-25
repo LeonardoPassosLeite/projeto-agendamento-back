@@ -21,18 +21,29 @@ namespace Agendamento.Infra.Data.Repositories
             return entity;
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>? orderBy = null)
-        {
-            var query = _context.Set<T>().AsQueryable();
-            if (orderBy != null)
-                query = query.OrderBy(orderBy);
-
-            return await query.ToListAsync();
-        }
-
         public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _context.Set<T>().FindAsync(id);
+        }
+
+        public virtual async Task<IPagedResult<T>> GetPagedAsync(Expression<Func<T, bool>>? filter = null, int page = 1, int pageSize = 10, string? filterText = null)
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (!string.IsNullOrWhiteSpace(filterText))
+                query = query.Where(e => EF.Functions.Like(EF.Property<string>(e, "Nome").ToLower(), $"%{filterText.ToLower()}%"));
+
+            int totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResultDTO<T>(items, totalCount);
         }
 
         public async Task<T?> UpdateAsync(T? entity)
