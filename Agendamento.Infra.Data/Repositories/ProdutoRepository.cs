@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using Agendamento.Application.Helpers;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;

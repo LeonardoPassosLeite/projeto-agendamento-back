@@ -1,5 +1,4 @@
 using Agendamento.Application.DTOs;
-using Agendamento.Domain.Entities;
 using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;

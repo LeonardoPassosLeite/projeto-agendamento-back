@@ -9,7 +9,6 @@ namespace Agendamento.Application.Mappings
         public DomainToDTOMappingProfile()
         {
             CreateMap<Categoria, CategoriaDTO>().ReverseMap();
-            CreateMap<Categoria, CategoriaActiveDTO>().ReverseMap();
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
             CreateMap<Produto, ProdutoFotoDTO>()
                 .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));

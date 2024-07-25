@@ -11,7 +11,7 @@ namespace Agendamento.WebAPI.Controllers
         public ProdutoController(IProdutoService produtoService) : base(produtoService)
         { }
 
-        [HttpGet("pageds")]
+        [HttpGet]
         public async Task<IActionResult> GetPageds([FromQuery] PaginationParams paginationParams)
         {
             var result = await _service.GetPagedProdutosAsync(paginationParams);
@@ -37,6 +37,12 @@ namespace Agendamento.WebAPI.Controllers
 
             await _service.UpdateStatusProdutoAsync(id, status);
             return NoContent();
+        }
+
+        [NonAction]
+        public override async Task<ActionResult<PagedResultDTO<ProdutoDTO>>> GetPaged([FromQuery] PaginationParams paginationParams)
+        {
+            return await base.GetPaged(paginationParams);
         }
     }
 }

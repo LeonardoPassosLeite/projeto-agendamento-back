@@ -29,6 +29,7 @@ namespace Agendamento.Infra.IoC
 
             // Use Cases
             services.AddScoped<AddFotoToProduto>();
+            services.AddScoped<GetPagedProdutos>();
             services.AddScoped<UpdateStatusProduto>();
             services.AddScoped<GetProdutoByCategoriaId>();
             services.AddScoped<UpdateProduto>();
