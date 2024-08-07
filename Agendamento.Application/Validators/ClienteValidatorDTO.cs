@@ -27,9 +27,6 @@ namespace Agendamento.Application.Validators
 
             RuleFor(x => x.Cidade)
                 .NotEmpty().WithMessage("Cidade é obrigatória");
-
-            RuleFor(x => x.Foto)
-                .MaximumLength(250).WithMessage("Foto excede o número de caracteres permitidos");
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Agendamento.Infra.Data.Repositories
             _categoriaContext = categoriaContext;
         }
 
-        public async Task Disable(Categoria categoria)
+        public async Task DisableAsync(Categoria categoria)
         {
             _categoriaContext.Categorias.Update(categoria);
             await _categoriaContext.SaveChangesAsync();

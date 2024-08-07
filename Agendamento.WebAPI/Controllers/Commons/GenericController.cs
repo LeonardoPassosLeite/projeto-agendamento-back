@@ -18,13 +18,6 @@ namespace Agendamento.WebAPI.Controllers
             _service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
-        [HttpPost]
-        public async Task<ActionResult<TDto>> Add([FromBody] TDto dto)
-        {
-            var result = await _service.AddAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
-
         [HttpGet("paged")]
         public virtual async Task<ActionResult<PagedResultDTO<TDto>>> GetPaged([FromQuery] PaginationParams paginationParams)
         {

@@ -1,3 +1,4 @@
+using Agendamento.Domain.Enitiies;
 using Agendamento.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,10 @@ namespace Agendamento.Infra.Data.Context
 
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<ClienteEmpresa> ClienteEmpresas { get; set; }
-        // public DbSet<Funcionario> Funcionarios { get; set; }
+        public DbSet<Funcionario> Funcionarios { get; set; }
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<Foto> Fotos { get; set; }
+        public DbSet<Empresa> Empresas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

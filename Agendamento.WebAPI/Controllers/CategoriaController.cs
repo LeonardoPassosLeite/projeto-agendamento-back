@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Agendamento.WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController] 
-    public class CategoriaController : GenericController<ICategoriaService, CategoriaDTO>
+    [ApiController]
+    public class CategoriaController : CustomAddController<ICategoriaService, CategoriaDTO>
     {
         public CategoriaController(ICategoriaService categoriaService) : base(categoriaService)
         { }
 
-        [HttpPost("{id}/status")]
-        public async Task<ActionResult> Disable(int id, [FromQuery] bool status)
+        [HttpPut("{id}/status")]
+        public async Task<ActionResult> UpdateStatus(int id, [FromQuery] bool status)
         {
             var categoriaDto = await _service.GetByIdAsync(id);
             if (categoriaDto == null)

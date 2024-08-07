@@ -7,10 +7,7 @@ namespace Agendamento.Domain.Entities
         public bool IsActive { get; set; } = true;
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
-        public Categoria(string nome)
-        {
-            InitialValue(nome);
-        }
+        public Categoria() { }
 
         public Categoria(int id, string nome)
         {
@@ -20,15 +17,10 @@ namespace Agendamento.Domain.Entities
             InitialValue(nome);
         }
 
-        public void Update(string nome)
-        {
-            InitialValue(nome);
-        }
-
-        public void Disable()
+        public void ToggleAcitve()
         {
             DomainValidationException.When(Produtos.Any(p => p.IsActive), "Não é possível desativar a categoria enquanto houver produtos ativos.");
-            IsActive = false;
+            IsActive = !IsActive;
         }
 
         private void InitialValue(string nome)

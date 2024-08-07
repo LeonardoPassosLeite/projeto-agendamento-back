@@ -6,7 +6,7 @@ namespace Agendamento.Domain.Entities
     {
         public string? Url { get; set; }
         public string? FilePath { get; set; }
-        public bool IsPrincipal { get; set; }
+        public bool IsPrincipal { get; set; } = true;
         public int ProdutoId { get; set; }
         public required Produto Produto { get; set; }
 

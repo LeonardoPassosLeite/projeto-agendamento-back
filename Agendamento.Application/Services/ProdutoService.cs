@@ -2,44 +2,85 @@ using Agendamento.Application.DTOs;
 using Agendamento.Application.Helpers;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Entities;
+using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using AutoMapper;
 using FluentValidation;
+using FluentValidation.Results;
 
-public class ProdutoService : GenericService<Produto, ProdutoDTO>, IProdutoService
+namespace Agendamento.Application.Services
 {
-    private readonly IProdutoRepository _produtoRepository;
-    private readonly AddFotoToProduto _addFotoToProduto;
-    private readonly GetPagedProdutos _getPagedProdutos;
-    private readonly UpdateProduto _updateProduto;
-    private readonly UpdateStatusProduto _updateStatusProduto;
-    private readonly GetProdutoByCategoriaId _getProdutoByCategoriaId;
-
-    public ProdutoService(IProdutoRepository produtoRepository, IGenericRepository<Produto> repository, IMapper mapper, IValidator<ProdutoDTO> validator,
-                          AddFotoToProduto addFotoToProduto,
-                          GetPagedProdutos getPagedProdutos,
-                          UpdateProduto updateProduto,
-                          UpdateStatusProduto updateStatusProduto,
-                          GetProdutoByCategoriaId getProdutoByCategoriaId) : base(repository, mapper, validator)
+    public class ProdutoService : CustomService<Produto, ProdutoDTO, ProdutoFotoDTO>, IProdutoService
     {
-        _produtoRepository = produtoRepository;
-        _addFotoToProduto = addFotoToProduto;
-        _getPagedProdutos = getPagedProdutos;
-        _updateProduto = updateProduto;
-        _updateStatusProduto = updateStatusProduto;
-        _getProdutoByCategoriaId = getProdutoByCategoriaId;
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly AddFotoToProduto _addFotoToProduto;
+        private readonly UpdateProduto _updateProduto;
+        private readonly UpdateStatusProduto _updateStatusProduto;
+        private readonly GetProdutoByCategoriaId _getProdutoByCategoriaId;
+
+        public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper, IValidator<ProdutoDTO> addValidator)
+            : base(produtoRepository, mapper, addValidator)
+        {
+            _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
+            _addFotoToProduto = new AddFotoToProduto(produtoRepository, mapper);
+            _updateProduto = new UpdateProduto(produtoRepository, mapper, addValidator);
+            _updateStatusProduto = new UpdateStatusProduto(produtoRepository);
+            _getProdutoByCategoriaId = new GetProdutoByCategoriaId(produtoRepository, mapper);
+        }
+
+        public async Task AddFotoToProdutoAsync(int produtoId, FotoDTO fotoDto)
+        {
+            await _addFotoToProduto.ExecuteAsync(produtoId, fotoDto);
+        }
+
+        public async Task UpdateStatusProdutoAsync(int id, bool isActive)
+        {
+            await _updateStatusProduto.ExecuteAsync(id, isActive);
+        }
+
+        public async Task<IEnumerable<ProdutoDTO>> GetProdutosByCategoriaIdAsync(int? id)
+        {
+            return await _getProdutoByCategoriaId.ExecuteAsync(id);
+        }
+
+        public override async Task<PagedResultDTO<ProdutoFotoDTO>> GetPagedAsync(PaginationParams paginationParams)
+        {
+            if (paginationParams == null)
+                throw new ValidationException("Parâmetros de paginação não podem ser nulos.");
+
+            var pagedResult = await _produtoRepository.GetPagedAsync(
+                filter: null,
+                page: paginationParams.Page,
+                pageSize: paginationParams.PageSize,
+                filterText: paginationParams.Filter,
+                p => p.FotoPrincipal!
+            );
+
+            var itemsDto = _mapper.Map<IEnumerable<ProdutoFotoDTO>>(pagedResult.Items);
+
+            return new PagedResultDTO<ProdutoFotoDTO>(itemsDto, pagedResult.TotalCount);
+        }
+
+        public override async Task<ProdutoFotoDTO> AddCustomAsync(ProdutoDTO dto)
+        {
+            if (dto == null)
+                throw new ValidationException("DTO não pode ser nulo.");
+
+            ValidationResult validationResult = await _addValidator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            try
+            {
+                var entity = _mapper.Map<Produto>(dto);
+                await _produtoRepository.AddAsync(entity);
+                return _mapper.Map<ProdutoFotoDTO>(entity);
+            }
+            catch (DatabaseException ex)
+            {
+                throw new ApplicationException("Ocorreu um erro ao adicionar a entidade.", ex);
+            }
+        }
     }
-
-    public override async Task<ProdutoDTO> UpdateAsync(ProdutoDTO dto)
-    {
-        await _updateProduto.ExecuteAsync(dto);
-
-        var produtoAtualizado = await _produtoRepository.GetByIdAsync(dto.Id);
-        return _mapper.Map<ProdutoDTO>(produtoAtualizado);
-    }
-
-    public Task AddFotoToProdutoAsync(int produtoId, FotoDTO fotoDto) => _addFotoToProduto.ExecuteAsync(produtoId, fotoDto);
-    public Task<PagedResultDTO<ProdutoFotoDTO>> GetPagedProdutosAsync(PaginationParams paginationParams) => _getPagedProdutos.ExecuteAsync(paginationParams);
-    public Task UpdateStatusProdutoAsync(int id, bool isActive) => _updateStatusProduto.ExecuteAsync(id, isActive);
-    public Task<IEnumerable<ProdutoDTO>> GetProdutoByCategoriaIdAsync(int? id) => _getProdutoByCategoriaId.ExecuteAsync(id);
 }

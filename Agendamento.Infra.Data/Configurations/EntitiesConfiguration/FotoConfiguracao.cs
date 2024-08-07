@@ -17,21 +17,8 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.Property(f => f.DataAtualizacao).IsRequired();
 
             builder.HasOne(f => f.Produto)
-                .WithMany()
-                .HasForeignKey(f => f.ProdutoId);
-
-            builder.HasData(
-                new
-                {
-                    Id = 2019664857,
-                    Url = "https://exemplo.com/foto1.jpg",
-                    FilePath = "https://exemplo.com/foto1.jpg",
-                    IsPrincipal = true,
-                    ProdutoId = 1,
-                    DataCriacao = DateTime.UtcNow,
-                    DataAtualizacao = DateTime.UtcNow
-                }
-            );
+                 .WithOne(p => p.FotoPrincipal)
+                 .HasForeignKey<Foto>(f => f.ProdutoId);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Agendamento.Domain.Common;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ namespace Agendamento.Infra.Data.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual async Task<IPagedResult<T>> GetPagedAsync(Expression<Func<T, bool>>? filter = null, int page = 1, int pageSize = 10, string? filterText = null)
+        public async Task<PagedResult<T>> GetPagedAsync(Expression<Func<T, bool>>? filter = null, int page = 1, int pageSize = 10, string? filterText = null, params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = _context.Set<T>();
 
@@ -36,6 +37,11 @@ namespace Agendamento.Infra.Data.Repositories
             if (!string.IsNullOrWhiteSpace(filterText))
                 query = query.Where(e => EF.Functions.Like(EF.Property<string>(e, "Nome").ToLower(), $"%{filterText.ToLower()}%"));
 
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+
             int totalCount = await query.CountAsync();
 
             var items = await query
@@ -43,7 +49,7 @@ namespace Agendamento.Infra.Data.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResultDTO<T>(items, totalCount);
+            return new PagedResult<T>(items, totalCount);
         }
 
         public async Task<T?> UpdateAsync(T? entity)

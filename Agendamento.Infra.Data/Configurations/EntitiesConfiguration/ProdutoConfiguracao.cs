@@ -16,54 +16,32 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
 
             builder.HasOne(p => p.Categoria)
                 .WithMany(c => c.Produtos)
-                .HasForeignKey(c => c.CategoriaId);
+                .HasForeignKey(p => p.CategoriaId);
 
             builder.HasOne(p => p.FotoPrincipal)
-                .WithOne()
-                .HasForeignKey<Produto>(p => p.FotoPrincipalId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithOne(f => f.Produto)
+                .HasForeignKey<Foto>(f => f.ProdutoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.Funcionario)
+                .WithMany(f => f.Produtos)
+                .HasForeignKey(p => p.FuncionarioId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasData(
-                          new
-                          {
-                              Id = 1,
-                              Nome = "Produto 1",
-                              Preco = 100.00M,
-                              Descricao = "Descrição Produto",
-                              CategoriaId = 1,
-                              FotoPrincipalId = (int?)null,
-                              IsActive = true,
-                              IsRascunho = true,
-                              DataCriacao = DateTime.UtcNow,
-                              DataAtualizacao = DateTime.UtcNow
-                          },
-                          new
-                          {
-                              Id = 2,
-                              Nome = "Produto 2",
-                              Preco = 200.00M,
-                              Descricao = "Descrição Produto",
-                              CategoriaId = 1,
-                              FotoPrincipalId = (int?)null,
-                              IsActive = true,
-                              IsRascunho = true,
-                              DataCriacao = DateTime.UtcNow,
-                              DataAtualizacao = DateTime.UtcNow
-                          },
-                          new
-                          {
-                              Id = 3,
-                              Nome = "Produto 3",
-                              Preco = 300.00M,
-                              Descricao = "Descrição Produto",
-                              CategoriaId = 2,
-                              FotoPrincipalId = (int?)null,
-                              IsActive = true,
-                              IsRascunho = true,
-                              DataCriacao = DateTime.UtcNow,
-                              DataAtualizacao = DateTime.UtcNow
-                          }
-                      );
+                new Produto
+                {
+                    Id = 1,
+                    Nome = "Produto Inicial",
+                    Descricao = "Descrição do Produto Inicial",
+                    Preco = 100.00M,
+                    CategoriaId = 1,
+                    IsActive = true,
+                    IsRascunho = true,
+                    DataCriacao = DateTime.UtcNow,
+                    DataAtualizacao = DateTime.UtcNow
+                }
+            );
         }
     }
 }

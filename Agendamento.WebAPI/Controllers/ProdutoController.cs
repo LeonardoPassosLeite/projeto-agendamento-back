@@ -1,48 +1,39 @@
-using Agendamento.Application.DTOs;
-using Agendamento.Application.Helpers;
-using Agendamento.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Agendamento.Application.Interfaces;
+using Agendamento.Application.DTOs;
 
 namespace Agendamento.WebAPI.Controllers
 {
-    [Route("/api/[controller]")]
-    public class ProdutoController : GenericController<IProdutoService, ProdutoDTO>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProdutoController : GenericController<IProdutoService, ProdutoFotoDTO>
     {
+        private readonly IProdutoService _produtoService;
+
         public ProdutoController(IProdutoService produtoService) : base(produtoService)
-        { }
-
-        [HttpGet]
-        public async Task<IActionResult> GetPageds([FromQuery] PaginationParams paginationParams)
         {
-            var result = await _service.GetPagedProdutosAsync(paginationParams);
-            return Ok(result);
+            _produtoService = produtoService;
         }
 
-        [HttpGet("categoria/{categoriaId}")]
-        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetByCategoriaId(int categoriaId)
+        [HttpPost("add")]
+        public async Task<ActionResult<ProdutoFotoDTO>> AddProduto([FromBody] ProdutoDTO dto)
         {
-            if (categoriaId <= 0)
-                return BadRequest(new { message = "Id de categoria deve ser maior que zero." });
-
-            var produtos = await _service.GetProdutoByCategoriaIdAsync(categoriaId);
-            return Ok(produtos);
+            var result = await _produtoService.AddCustomAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        [HttpPost("{id}/status")]
-        public async Task<ActionResult> Disable(int id, [FromQuery] bool status)
+        [HttpPut("{id}/status")]
+        public async Task<ActionResult> UpdateStatusProduto(int id, [FromBody] bool isActive)
         {
-            var produtoDto = await _service.GetByIdAsync(id);
-            if (produtoDto == null)
-                return NotFound($"Produto com Id {id} não encontrado.");
-
-            await _service.UpdateStatusProdutoAsync(id, status);
+            await _produtoService.UpdateStatusProdutoAsync(id, isActive);
             return NoContent();
         }
 
-        [NonAction]
-        public override async Task<ActionResult<PagedResultDTO<ProdutoDTO>>> GetPaged([FromQuery] PaginationParams paginationParams)
+        [HttpGet("categoria/{categoriaId}")]
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosByCategoriaId(int categoriaId)
         {
-            return await base.GetPaged(paginationParams);
+            var produtos = await _produtoService.GetProdutosByCategoriaIdAsync(categoriaId);
+            return Ok(produtos);
         }
     }
 }

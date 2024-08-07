@@ -1,8 +1,9 @@
+using Agendamento.Application.DTOs.Commons;
 using Agendamento.Application.Helpers;
 
 namespace Agendamento.Application.Interfaces
 {
-    public interface IGenericService<TDto> where TDto : class
+    public interface IGenericService<TDto> where TDto : BaseDTO
     {
         Task<TDto> AddAsync(TDto dto);
         Task<PagedResultDTO<TDto>> GetPagedAsync(PaginationParams paginationParams);

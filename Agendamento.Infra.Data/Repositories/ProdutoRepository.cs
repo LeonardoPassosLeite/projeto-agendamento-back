@@ -14,24 +14,6 @@ namespace Agendamento.Infra.Data.Repositories
             _produtoContext = produtoContext;
         }
 
-        public async Task<(IEnumerable<Produto> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? filterText)
-        {
-            IQueryable<Produto> query = _produtoContext.Produtos
-                .Include(p => p.FotoPrincipal);
-
-            if (!string.IsNullOrWhiteSpace(filterText))
-                query = query.Where(p => EF.Functions.Like(EF.Property<string>(p, "Nome").ToLower(), $"%{filterText.ToLower()}%"));
-
-            int totalCount = await query.CountAsync();
-
-            var produtos = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return (produtos, totalCount);
-        }
-
         public override async Task<Produto?> GetByIdAsync(int id)
         {
             return await _produtoContext.Produtos

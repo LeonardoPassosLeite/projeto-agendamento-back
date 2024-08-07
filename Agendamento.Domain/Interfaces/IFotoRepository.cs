@@ -4,7 +4,6 @@ namespace Agendamento.Domain.Interfaces
 {
     public interface IFotoRepository : IGenericRepository<Foto>
     {
-        Task<bool> FotoPrincipalExistAsync(int produtoId);
-        
+        // Task<bool> FotoPrincipalExistAsync(int produtoId);
     }
 }

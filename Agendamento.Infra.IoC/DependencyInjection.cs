@@ -23,19 +23,20 @@ namespace Agendamento.Infra.IoC
 
             // Repositories
             services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IFotoRepository, FotoRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Use Cases
             services.AddScoped<AddFotoToProduto>();
-            services.AddScoped<GetPagedProdutos>();
             services.AddScoped<UpdateStatusProduto>();
             services.AddScoped<GetProdutoByCategoriaId>();
             services.AddScoped<UpdateProduto>();
 
             // Services
             services.AddScoped<ICategoriaService, CategoriaService>();
+            services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IProdutoService, ProdutoService>();
             services.AddScoped<IFotoService, FotoService>();
 

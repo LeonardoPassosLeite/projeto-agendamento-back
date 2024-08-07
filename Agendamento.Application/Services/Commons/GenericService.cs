@@ -7,7 +7,9 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 
-public class GenericService<TEntity, TDto> : IGenericService<TDto> where TEntity : class where TDto : BaseDTO
+public class GenericService<TEntity, TDto> : IGenericService<TDto>
+    where TEntity : class
+    where TDto : BaseDTO
 {
     protected readonly IGenericRepository<TEntity> _repository;
     protected readonly IMapper _mapper;
@@ -15,12 +17,12 @@ public class GenericService<TEntity, TDto> : IGenericService<TDto> where TEntity
 
     public GenericService(IGenericRepository<TEntity> repository, IMapper mapper, IValidator<TDto> validator)
     {
-        _repository = repository;
-        _mapper = mapper;
-        _validator = validator;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    public async Task<TDto> AddAsync(TDto dto)
+    public virtual async Task<TDto> AddAsync(TDto dto)
     {
         if (dto == null)
             throw new ValidationException("DTO não pode ser nulo.");

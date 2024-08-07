@@ -1,4 +1,5 @@
 using Agendamento.Application.DTOs;
+using Agendamento.Domain.Enitiies;
 using Agendamento.Domain.Entities;
 using AutoMapper;
 
@@ -13,8 +14,9 @@ namespace Agendamento.Application.Mappings
             CreateMap<Produto, ProdutoFotoDTO>()
                 .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
             CreateMap<Cliente, ClienteDTO>().ReverseMap();
-            CreateMap<ClienteEmpresa, ClienteEmpresaDTO>().ReverseMap();
-            CreateMap<EmpresaCliente, EmpresaClienteDTO>().ReverseMap();
+            CreateMap<Cliente, ClienteFotoDTO>().ReverseMap()
+                .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
+            CreateMap<Funcionario, FuncionarioDTO>().ReverseMap();
             CreateMap<Foto, FotoDTO>().ReverseMap();
             CreateMap<Foto, FotoUploadDTO>().ReverseMap();
         }
