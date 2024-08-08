@@ -23,7 +23,7 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.Property(c => c.IsVisit).IsRequired();
 
             builder.HasOne(c => c.FotoPrincipal)
-                .WithOne()
+                .WithOne(c => c.Cliente)
                 .HasForeignKey<Cliente>(c => c.FotoPrincipalId)
                 .OnDelete(DeleteBehavior.Restrict);
 

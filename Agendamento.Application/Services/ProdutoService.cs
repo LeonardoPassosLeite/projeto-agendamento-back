@@ -13,7 +13,6 @@ namespace Agendamento.Application.Services
     public class ProdutoService : CustomService<Produto, ProdutoDTO, ProdutoFotoDTO>, IProdutoService
     {
         private readonly IProdutoRepository _produtoRepository;
-        private readonly AddFotoToProduto _addFotoToProduto;
         private readonly UpdateProduto _updateProduto;
         private readonly UpdateStatusProduto _updateStatusProduto;
         private readonly GetProdutoByCategoriaId _getProdutoByCategoriaId;
@@ -22,25 +21,9 @@ namespace Agendamento.Application.Services
             : base(produtoRepository, mapper, addValidator)
         {
             _produtoRepository = produtoRepository ?? throw new ArgumentNullException(nameof(produtoRepository));
-            _addFotoToProduto = new AddFotoToProduto(produtoRepository, mapper);
             _updateProduto = new UpdateProduto(produtoRepository, mapper, addValidator);
             _updateStatusProduto = new UpdateStatusProduto(produtoRepository);
             _getProdutoByCategoriaId = new GetProdutoByCategoriaId(produtoRepository, mapper);
-        }
-
-        public async Task AddFotoToProdutoAsync(int produtoId, FotoDTO fotoDto)
-        {
-            await _addFotoToProduto.ExecuteAsync(produtoId, fotoDto);
-        }
-
-        public async Task UpdateStatusProdutoAsync(int id, bool isActive)
-        {
-            await _updateStatusProduto.ExecuteAsync(id, isActive);
-        }
-
-        public async Task<IEnumerable<ProdutoDTO>> GetProdutosByCategoriaIdAsync(int? id)
-        {
-            return await _getProdutoByCategoriaId.ExecuteAsync(id);
         }
 
         public override async Task<PagedResultDTO<ProdutoFotoDTO>> GetPagedAsync(PaginationParams paginationParams)
@@ -81,6 +64,16 @@ namespace Agendamento.Application.Services
             {
                 throw new ApplicationException("Ocorreu um erro ao adicionar a entidade.", ex);
             }
+        }
+
+        public async Task UpdateStatusProdutoAsync(int id, bool isActive)
+        {
+            await _updateStatusProduto.ExecuteAsync(id, isActive);
+        }
+
+        public async Task<IEnumerable<ProdutoDTO>> GetProdutosByCategoriaIdAsync(int? id)
+        {
+            return await _getProdutoByCategoriaId.ExecuteAsync(id);
         }
     }
 }

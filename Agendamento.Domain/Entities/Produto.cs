@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Agendamento.Domain.Enitiies;
 
 namespace Agendamento.Domain.Entities
@@ -7,7 +9,7 @@ namespace Agendamento.Domain.Entities
         public decimal Preco { get; set; }
         public string? Descricao { get; set; }
         public int? FotoPrincipalId { get; set; }
-        public Foto? FotoPrincipal { get; set; }
+        public FotoProduto? FotoPrincipal { get; set; }
 
         public bool IsActive { get; set; } = true;
         public bool IsRascunho { get; set; } = true;
@@ -32,10 +34,10 @@ namespace Agendamento.Domain.Entities
             IsRascunho = false;
         }
 
-        public void SetFotoPrincipal(Foto foto)
+        public void SetFotoPrincipal(FotoProduto fotoProduto)
         {
-            FotoPrincipal = foto;
-            FotoPrincipalId = foto.Id;
+            FotoPrincipal = fotoProduto;
+            FotoPrincipalId = fotoProduto.Id;
             IsRascunho = false;
         }
 

@@ -8,7 +8,5 @@ namespace Agendamento.Domain.Entities
         public bool IsVisit { get; set; } = false;
 
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
-
-        public Cliente() { }
     }
 }

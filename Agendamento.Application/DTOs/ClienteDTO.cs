@@ -11,6 +11,6 @@ namespace Agendamento.Application.DTOs
     public class ClienteFotoDTO : BaseInfosDTO
     {
         public bool isVisit { get; set; }
-        public Foto? FotoPrincipal { get; set; }
+        public FotoClienteDTO? FotoPrincipal { get; set; }
     }
 }

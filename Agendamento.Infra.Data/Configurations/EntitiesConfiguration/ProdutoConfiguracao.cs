@@ -16,11 +16,12 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
 
             builder.HasOne(p => p.Categoria)
                 .WithMany(c => c.Produtos)
-                .HasForeignKey(p => p.CategoriaId);
+                .HasForeignKey(p => p.CategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.FotoPrincipal)
                 .WithOne(f => f.Produto)
-                .HasForeignKey<Foto>(f => f.ProdutoId)
+                .HasForeignKey<FotoProduto>(f => f.ProdutoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(p => p.Funcionario)

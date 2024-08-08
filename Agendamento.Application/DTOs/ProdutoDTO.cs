@@ -11,8 +11,8 @@ namespace Agendamento.Application.DTOs
 
     public class ProdutoFotoDTO : ProdutoDTO
     {
-        public FotoDTO? FotoPrincipal { get; set; }
         public bool IsActive { get; set; }
         public bool IsRascunho { get; set; }
+        public FotoProdutoDTO? FotoPrincipal { get; set; }
     }
 }

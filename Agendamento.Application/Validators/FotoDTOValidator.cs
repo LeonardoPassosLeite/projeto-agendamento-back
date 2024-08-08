@@ -1,12 +1,13 @@
 using Agendamento.Application.DTOs;
+using Agendamento.Application.DTOs.Commons;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
-public class FotoUploadDTOValidator : AbstractValidator<FotoUploadDTO>
+public class FotoDTOValidatorBase<T> : AbstractValidator<T> where T : FotoDTOBase
 {
     private const long MaxFileSize = 5 * 1024 * 1024;
 
-    public FotoUploadDTOValidator()
+    public FotoDTOValidatorBase()
     {
         RuleFor(foto => foto.File)
             .NotNull()
@@ -39,4 +40,16 @@ public class FotoUploadDTOValidator : AbstractValidator<FotoUploadDTO>
 
         return file.Length <= MaxFileSize;
     }
+}
+
+public class FotoProdutoDTOValidator : FotoDTOValidatorBase<FotoProdutoDTO>
+{
+    public FotoProdutoDTOValidator()
+    { }
+}
+
+public class FotoClienteDTOValidator : FotoDTOValidatorBase<FotoClienteDTO>
+{
+    public FotoClienteDTOValidator()
+    { }
 }

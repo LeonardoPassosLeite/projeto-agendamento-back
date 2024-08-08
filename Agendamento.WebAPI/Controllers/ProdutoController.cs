@@ -23,7 +23,7 @@ namespace Agendamento.WebAPI.Controllers
         }
 
         [HttpPut("{id}/status")]
-        public async Task<ActionResult> UpdateStatusProduto(int id, [FromBody] bool isActive)
+        public async Task<ActionResult> UpdateStatusProduto(int id, [FromQuery] bool isActive)
         {
             await _produtoService.UpdateStatusProdutoAsync(id, isActive);
             return NoContent();

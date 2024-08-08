@@ -8,22 +8,28 @@ namespace Agendamento.WebAPI.Controllers
     [ApiController]
     public class FotoController : ControllerBase
     {
-        private readonly IFotoService _fotoService;
-        private readonly IProdutoService _produtoService;
+        private readonly IFotoProdutoService _fotoProdutoService;
+        private readonly IFotoClienteService _fotoClienteService;
 
-        public FotoController(IFotoService fotoService, IProdutoService produtoService)
+        public FotoController(IFotoProdutoService fotoProdutoService,
+                              IFotoClienteService fotoClienteService)
         {
-            _fotoService = fotoService;
-            _produtoService = produtoService;
+            _fotoProdutoService = fotoProdutoService;
+            _fotoClienteService = fotoClienteService;
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile([FromForm] FotoUploadDTO fotoUploadDto)
+        [HttpPost("upload/produto")]
+        public async Task<ActionResult<FotoProdutoDTO>> UploadFotoProduto([FromForm] FotoProdutoDTO fotoProdutoDto)
         {
-            var fotoDto = await _fotoService.UploadFileAsync(fotoUploadDto);
-            await _produtoService.AddFotoToProdutoAsync(fotoUploadDto.ProdutoId, fotoDto);
-
-            return Ok(new { Id = fotoDto.Id, Url = fotoDto.Url });
+            var result = await _fotoProdutoService.UploadFileAsync(fotoProdutoDto);
+            return Ok(result);
+        }
+        
+        [HttpPost("upload/cliente")]
+        public async Task<ActionResult<FotoClienteDTO>> UploadFotoCliente([FromForm] FotoClienteDTO fotoClienteDto)
+        {
+            var result = await _fotoClienteService.UploadFileAsync(fotoClienteDto);
+            return Ok(result);
         }
     }
 }

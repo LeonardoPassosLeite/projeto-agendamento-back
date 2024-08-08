@@ -9,16 +9,25 @@ namespace Agendamento.Application.Mappings
     {
         public DomainToDTOMappingProfile()
         {
+            // Mapeamentos de Categoria
             CreateMap<Categoria, CategoriaDTO>().ReverseMap();
+
+            // Mapeamentos de Produto
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
             CreateMap<Produto, ProdutoFotoDTO>()
                 .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
+
+            // Mapeamentos de Cliente
             CreateMap<Cliente, ClienteDTO>().ReverseMap();
-            CreateMap<Cliente, ClienteFotoDTO>().ReverseMap()
+            CreateMap<Cliente, ClienteFotoDTO>()
                 .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
+
+            // Mapeamentos de Funcionario
             CreateMap<Funcionario, FuncionarioDTO>().ReverseMap();
-            CreateMap<Foto, FotoDTO>().ReverseMap();
-            CreateMap<Foto, FotoUploadDTO>().ReverseMap();
+
+            // Mapeamentos de FotoProduto e FotoCliente
+            CreateMap<FotoProduto, FotoProdutoDTO>().ReverseMap();
+            CreateMap<FotoCliente, FotoClienteDTO>().ReverseMap();
         }
     }
 }

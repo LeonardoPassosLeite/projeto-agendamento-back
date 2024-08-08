@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Agendamento.Domain.Common;
+using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -72,8 +73,44 @@ namespace Agendamento.Infra.Data.Repositories
             if (existingEntity == null)
                 return null;
 
+            // Copy original RowVersion
+            var rowVersionProperty = _context.Model.FindEntityType(typeof(T))?.FindProperty("RowVersion");
+
+            if (rowVersionProperty != null)
+            {
+                var originalRowVersion = rowVersionProperty.PropertyInfo.GetValue(entity);
+                _context.Entry(existingEntity).Property("RowVersion").OriginalValue = originalRowVersion;
+            }
+
             _context.Entry(existingEntity).CurrentValues.SetValues(entity);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Handle concurrency conflict
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.Entity.GetType() == typeof(T))
+                    {
+                        var databaseEntry = entry.GetDatabaseValues();
+                        if (databaseEntry == null)
+                        {
+                            throw new NotFoundException("A entidade já foi excluída por outra transação.");
+                        }
+                        else
+                        {
+                            var databaseValues = databaseEntry.ToObject();
+                            // Optionally handle the conflict here, e.g., notify the user
+                            entry.OriginalValues.SetValues(databaseEntry);
+                            throw new DbUpdateConcurrencyException("A entidade foi modificada por outra transação. Tente novamente.", ex);
+                        }
+                    }
+                }
+            }
+
             return existingEntity;
         }
 
