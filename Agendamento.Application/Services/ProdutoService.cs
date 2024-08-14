@@ -36,7 +36,8 @@ namespace Agendamento.Application.Services
                 page: paginationParams.Page,
                 pageSize: paginationParams.PageSize,
                 filterText: paginationParams.Filter,
-                p => p.FotoPrincipal!
+                p => p.FotoPrincipal!,
+                p => p.Categoria
             );
 
             var itemsDto = _mapper.Map<IEnumerable<ProdutoFotoDTO>>(pagedResult.Items);

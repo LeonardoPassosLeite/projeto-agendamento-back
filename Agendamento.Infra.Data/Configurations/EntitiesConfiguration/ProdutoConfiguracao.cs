@@ -24,11 +24,6 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                 .HasForeignKey<FotoProduto>(f => f.ProdutoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(p => p.Funcionario)
-                .WithMany(f => f.Produtos)
-                .HasForeignKey(p => p.FuncionarioId)
-                .OnDelete(DeleteBehavior.SetNull);
-
             builder.HasData(
                 new Produto
                 {
@@ -37,10 +32,6 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                     Descricao = "Descrição do Produto Inicial",
                     Preco = 100.00M,
                     CategoriaId = 1,
-                    IsActive = true,
-                    IsRascunho = true,
-                    DataCriacao = DateTime.UtcNow,
-                    DataAtualizacao = DateTime.UtcNow
                 }
             );
         }

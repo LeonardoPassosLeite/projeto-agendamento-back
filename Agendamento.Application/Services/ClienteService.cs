@@ -1,4 +1,5 @@
 using Agendamento.Application.DTOs;
+using Agendamento.Application.Helpers;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Interfaces;
@@ -15,6 +16,24 @@ namespace Agendamento.Application.Services
             : base(clienteRepository, mapper, addValidator)
         {
             _clienteRepository = clienteRepository ?? throw new ArgumentNullException(nameof(clienteRepository));
+        }
+
+        public override async Task<PagedResultDTO<ClienteFotoDTO>> GetPagedAsync(PaginationParams paginationParams)
+        {
+            if (paginationParams == null)
+                throw new ValidationException("Parâmetros de paginação não podem ser nulos.");
+
+            var pagedResult = await _clienteRepository.GetPagedAsync(
+                filter: null,
+                page: paginationParams.Page,
+                pageSize: paginationParams.PageSize,
+                filterText: paginationParams.Filter,
+                c => c.FotoPrincipal! 
+            );
+
+            var itemsDto = _mapper.Map<IEnumerable<ClienteFotoDTO>>(pagedResult.Items);
+
+            return new PagedResultDTO<ClienteFotoDTO>(itemsDto, pagedResult.TotalCount);
         }
     }
 }

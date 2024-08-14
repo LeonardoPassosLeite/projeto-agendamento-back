@@ -10,7 +10,6 @@ namespace Agendamento.Domain.Enitiies
         public int EmpresaId { get; set; }
         public required Empresa Empresa { get; set; }
 
-        public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
         public Funcionario() { }
     }

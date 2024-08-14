@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Agendamento.Domain.Enitiies;
 
 namespace Agendamento.Domain.Entities
@@ -17,11 +15,8 @@ namespace Agendamento.Domain.Entities
         public int CategoriaId { get; set; }
         public Categoria Categoria { get; set; }
 
-        public int? ClienteId { get; set; }
-        public Cliente? Cliente { get; set; }
-
-        public int? FuncionarioId { get; set; }
-        public Funcionario? Funcionario { get; set; }
+        public ICollection<Cliente> Clientes { get; set; } = new List<Cliente>();
+        public ICollection<Empresa> Empresa { get; set; } = new List<Empresa>();
 
         public Produto() { }
 

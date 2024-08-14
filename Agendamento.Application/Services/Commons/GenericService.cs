@@ -22,7 +22,7 @@ public class GenericService<TEntity, TDto> : IGenericService<TDto>
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    public virtual async Task<TDto> AddAsync(TDto dto)
+    public async Task<TDto> AddAsync(TDto dto)
     {
         if (dto == null)
             throw new ValidationException("DTO não pode ser nulo.");

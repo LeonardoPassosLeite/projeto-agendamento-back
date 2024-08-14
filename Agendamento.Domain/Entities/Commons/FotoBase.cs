@@ -1,4 +1,3 @@
-using Agendamento.Domain.Exceptions;
 using Agendamento.Domain.Interfaces;
 
 namespace Agendamento.Domain.Entities.Commons
@@ -20,11 +19,6 @@ namespace Agendamento.Domain.Entities.Commons
             Url = url;
             FilePath = filePath;
             IsPrincipal = isPrincipal;
-        }
-
-        protected void ValidateCommonExceptions()
-        {
-            DomainValidationException.When(!string.IsNullOrEmpty(Url) && Url.Length < 5, "URL deve ter no mínimo 5 caracteres");
         }
     }
 }

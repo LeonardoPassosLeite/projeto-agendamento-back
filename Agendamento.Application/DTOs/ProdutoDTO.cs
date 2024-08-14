@@ -14,5 +14,6 @@ namespace Agendamento.Application.DTOs
         public bool IsActive { get; set; }
         public bool IsRascunho { get; set; }
         public FotoProdutoDTO? FotoPrincipal { get; set; }
+        public CategoriaDTO? Categoria { get; set; }
     }
 }

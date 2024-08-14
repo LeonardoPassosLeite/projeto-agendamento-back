@@ -20,7 +20,7 @@ public class UpdateStatusProduto
         if (produtoEntity == null)
             throw new NotFoundException($"Produto com Id {id} não encontrado.");
 
-        produtoEntity.IsActive = isActive;
+        produtoEntity.ToggleAcitve();
         await _produtoRepository.UpdateAsync(produtoEntity);
     }
 }

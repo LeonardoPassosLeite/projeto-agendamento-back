@@ -8,7 +8,7 @@ namespace Agendamento.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         public ICollection<Funcionario> Funcionarios { get; set; } = new List<Funcionario>();
-        // public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
+        public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
         public Empresa() { }
 

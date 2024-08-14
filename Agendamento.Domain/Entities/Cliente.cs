@@ -7,6 +7,11 @@ namespace Agendamento.Domain.Entities
         public int Idade { get; set; }
         public bool IsVisit { get; set; } = false;
 
+        public int? FotoPrincipalId { get; set; }
+        public FotoCliente? FotoPrincipal { get; set; }
+
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
+
+        public Cliente() { }
     }
 }

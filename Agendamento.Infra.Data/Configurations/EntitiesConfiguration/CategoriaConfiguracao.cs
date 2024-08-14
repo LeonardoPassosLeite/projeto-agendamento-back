@@ -14,10 +14,11 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.Property(p => p.Nome).HasMaxLength(100).IsRequired();
 
             builder.HasData(
-                new Categoria(1, "Categoria 1"),
-                new Categoria(2, "Categoria 2"),
-                new Categoria(3, "Categoria 3"),
-                new Categoria(4, "Categoria 4")
+                new Categoria { Id = 1, Nome = "Categoria 1" },
+                new Categoria { Id = 2, Nome = "Categoria 2" },
+                new Categoria { Id = 3, Nome = "Categoria 3" },
+                new Categoria { Id = 4, Nome = "Categoria 4" },
+                new Categoria { Id = 5, Nome = "Categoria 5" }
             );
         }
     }

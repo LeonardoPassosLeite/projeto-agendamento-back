@@ -7,6 +7,7 @@ namespace Agendamento.Domain.Entities
         public DateTime DataAtualizacao { get; set; } = DateTime.UtcNow;
 
     }
+    
     public class SimpleEntity : BaseEntity
     {
         public string Nome { get; set; } = string.Empty;
@@ -20,7 +21,5 @@ namespace Agendamento.Domain.Entities
         public string Cidade { get; set; } = string.Empty;
         public string Uf { get; set; } = string.Empty;
         public string Pais { get; set; } = string.Empty;
-        public int? FotoPrincipalId { get; set; }
-        public FotoCliente? FotoPrincipal { get; set; }
     }
 }

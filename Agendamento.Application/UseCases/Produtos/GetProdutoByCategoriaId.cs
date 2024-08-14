@@ -15,7 +15,7 @@ public class GetProdutoByCategoriaId
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProdutoDTO>> ExecuteAsync(int? id)
+    public async Task<IEnumerable<ProdutoFotoDTO>> ExecuteAsync(int? id)
     {
         if (id == null)
             throw new ValidationException("Id da categoria não pode ser nulo.");
@@ -24,6 +24,6 @@ public class GetProdutoByCategoriaId
         if (!produtos.Any())
             throw new NotFoundException($"Nenhum produto encontrado para a categoria com Id {id.Value}.");
 
-        return _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+        return _mapper.Map<IEnumerable<ProdutoFotoDTO>>(produtos);
     }
 }

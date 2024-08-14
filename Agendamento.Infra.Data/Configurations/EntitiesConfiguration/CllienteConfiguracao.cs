@@ -23,8 +23,8 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.Property(c => c.IsVisit).IsRequired();
 
             builder.HasOne(c => c.FotoPrincipal)
-                .WithOne(c => c.Cliente)
-                .HasForeignKey<Cliente>(c => c.FotoPrincipalId)
+                .WithOne(f => f.Cliente)
+                .HasForeignKey<FotoCliente>(fc => fc.ClienteId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasData(
@@ -41,8 +41,6 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                Uf = "EX",
                Pais = "País Exemplo",
                Empresa = "Empresa Inical",
-               IsVisit = true,
-               FotoPrincipalId = null
            });
         }
     }

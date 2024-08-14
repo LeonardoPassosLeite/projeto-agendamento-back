@@ -15,7 +15,8 @@ namespace Agendamento.Application.Mappings
             // Mapeamentos de Produto
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
             CreateMap<Produto, ProdutoFotoDTO>()
-                .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal));
+                .ForMember(dest => dest.FotoPrincipal, opt => opt.MapFrom(src => src.FotoPrincipal))
+                .ForMember(dest => dest.Categoria, opt => opt.MapFrom(src => src.Categoria));
 
             // Mapeamentos de Cliente
             CreateMap<Cliente, ClienteDTO>().ReverseMap();

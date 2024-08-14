@@ -18,6 +18,7 @@ namespace Agendamento.Infra.Data.Repositories
         {
             return await _produtoContext.Produtos
                     .Include(p => p.FotoPrincipal)
+                    .Include(p => p.Categoria)
                     .FirstOrDefaultAsync(p => p.Id == id);
         }
 
