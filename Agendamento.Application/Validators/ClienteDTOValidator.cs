@@ -29,4 +29,10 @@ namespace Agendamento.Application.Validators
                 .NotEmpty().WithMessage("Cidade é obrigatória");
         }
     }
+
+    public class ClienteFotoDTOValidator : AbstractValidator<ClienteFotoDTO>
+    {
+        public ClienteFotoDTOValidator()
+        { }
+    }
 }

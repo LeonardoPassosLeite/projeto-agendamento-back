@@ -23,9 +23,16 @@ namespace Agendamento.Infra.Data.Repositories
             return entity;
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id, params Expression<Func<T, object>>[] includeProperties)
         {
-            return await _context.Set<T>().FindAsync(id);
+            IQueryable<T> query = _context.Set<T>();
+
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
 
         public async Task<PagedResult<T>> GetPagedAsync(Expression<Func<T, bool>>? filter = null, int page = 1, int pageSize = 10, string? filterText = null, params Expression<Func<T, object>>[] includeProperties)
@@ -73,15 +80,6 @@ namespace Agendamento.Infra.Data.Repositories
             if (existingEntity == null)
                 return null;
 
-            // Copy original RowVersion
-            var rowVersionProperty = _context.Model.FindEntityType(typeof(T))?.FindProperty("RowVersion");
-
-            if (rowVersionProperty != null)
-            {
-                var originalRowVersion = rowVersionProperty.PropertyInfo.GetValue(entity);
-                _context.Entry(existingEntity).Property("RowVersion").OriginalValue = originalRowVersion;
-            }
-
             _context.Entry(existingEntity).CurrentValues.SetValues(entity);
 
             try
@@ -90,7 +88,6 @@ namespace Agendamento.Infra.Data.Repositories
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                // Handle concurrency conflict
                 foreach (var entry in ex.Entries)
                 {
                     if (entry.Entity.GetType() == typeof(T))
@@ -103,7 +100,6 @@ namespace Agendamento.Infra.Data.Repositories
                         else
                         {
                             var databaseValues = databaseEntry.ToObject();
-                            // Optionally handle the conflict here, e.g., notify the user
                             entry.OriginalValues.SetValues(databaseEntry);
                             throw new DbUpdateConcurrencyException("A entidade foi modificada por outra transação. Tente novamente.", ex);
                         }

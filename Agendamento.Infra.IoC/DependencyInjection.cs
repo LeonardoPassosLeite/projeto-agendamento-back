@@ -31,7 +31,6 @@ namespace Agendamento.Infra.IoC
             // Use Cases
             services.AddScoped<UpdateStatusProduto>();
             services.AddScoped<GetProdutoByCategoriaId>();
-            services.AddScoped<UpdateProduto>();
 
             // Services
             services.AddScoped<ICategoriaService, CategoriaService>();
@@ -45,7 +44,7 @@ namespace Agendamento.Infra.IoC
 
             // FluentValidation
             services.AddValidatorsFromAssemblyContaining<ProdutoDTOValidator>();
-
+            services.AddValidatorsFromAssemblyContaining<ClienteDTOValidator>();
 
             return services;
         }

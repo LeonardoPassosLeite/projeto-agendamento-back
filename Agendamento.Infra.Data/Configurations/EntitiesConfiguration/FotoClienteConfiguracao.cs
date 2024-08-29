@@ -11,6 +11,7 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.HasKey(fc => fc.Id);
             builder.Property(fc => fc.Id).ValueGeneratedOnAdd();
             builder.Property(fc => fc.Url).HasMaxLength(255).IsRequired();
+            builder.Property(fc => fc.FilePath).HasMaxLength(255);
             builder.Property(fc => fc.IsPrincipal).IsRequired();
 
             builder.HasOne(fc => fc.Cliente)

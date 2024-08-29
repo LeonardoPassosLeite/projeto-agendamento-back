@@ -1,5 +1,4 @@
 using Agendamento.Application.DTOs.Commons;
-using Agendamento.Domain.Entities;
 
 namespace Agendamento.Application.DTOs
 {

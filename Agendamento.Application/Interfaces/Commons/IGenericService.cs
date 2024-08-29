@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Agendamento.Application.DTOs.Commons;
 using Agendamento.Application.Helpers;
 

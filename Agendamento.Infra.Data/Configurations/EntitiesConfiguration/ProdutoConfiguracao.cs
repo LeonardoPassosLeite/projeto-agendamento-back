@@ -20,8 +20,8 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.FotoPrincipal)
-                .WithOne(f => f.Produto)
-                .HasForeignKey<FotoProduto>(f => f.ProdutoId)
+                .WithOne(fp => fp.Produto)
+                .HasForeignKey<FotoProduto>(fp => fp.ProdutoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasData(

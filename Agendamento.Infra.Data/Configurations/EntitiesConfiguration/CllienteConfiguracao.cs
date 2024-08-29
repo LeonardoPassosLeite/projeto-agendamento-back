@@ -23,9 +23,9 @@ namespace Agendamento.Infra.Data.EntitiesConfiguration
             builder.Property(c => c.IsVisit).IsRequired();
 
             builder.HasOne(c => c.FotoPrincipal)
-                .WithOne(f => f.Cliente)
+                .WithOne(fc => fc.Cliente)
                 .HasForeignKey<FotoCliente>(fc => fc.ClienteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasData(
            new Cliente

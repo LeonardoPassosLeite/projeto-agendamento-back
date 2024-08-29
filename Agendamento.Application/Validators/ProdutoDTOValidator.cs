@@ -22,5 +22,11 @@ namespace Agendamento.Application.Validators
             RuleFor(x => x.CategoriaId)
                 .GreaterThan(0).WithMessage("CategoriaId é obrigatório e deve ser maior que zero");
         }
+
+        public class ProdutoFotoDTOValidator : AbstractValidator<ProdutoFotoDTO>
+        {
+            public ProdutoFotoDTOValidator()
+            { }
+        }
     }
 }

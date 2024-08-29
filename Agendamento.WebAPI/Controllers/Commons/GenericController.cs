@@ -25,16 +25,6 @@ namespace Agendamento.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<TDto>> Update(int id, [FromBody] TDto dto)
-        {
-            if (id != dto.Id)
-                return BadRequest("ID inválido");
-
-            var result = await _service.UpdateAsync(dto);
-            return Ok(result);
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<TDto>> GetById(int id)
         {

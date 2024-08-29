@@ -30,9 +30,11 @@ public class FotoClienteService : FotoServiceBase<FotoCliente, FotoClienteDTO>, 
             if (cliente == null)
                 throw new NotFoundException($"Cliente com Id {fotoClienteUploadDto.ClienteId} não encontrado.");
 
-            // Adicione lógica adicional necessária para associar a foto ao cliente, se necessário.
-            // Exemplo: cliente.SetFotoPrincipal(foto);
-            // await _clienteRepository.UpdateAsync(cliente);
+            if (cliente.FotoPrincipalId.HasValue)
+                throw new ConflictException($"O produto com Id {fotoClienteUploadDto.ClienteId} já possui uma foto principal.");
+            
+            cliente.SetFotoPrincipal(foto);
+            await _clienteRepository.UpdateAsync(cliente);
         });
     }
 }
