@@ -2,7 +2,6 @@ using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Interfaces.Commons;
 using Agendamento.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Agendamento.Infra.Data.Repositories
 {

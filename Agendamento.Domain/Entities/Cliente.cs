@@ -13,5 +13,11 @@ namespace Agendamento.Domain.Entities
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
 
         public Cliente() { }
+
+        public void SetFotoPrincipal(FotoCliente fotoCliente)
+        {
+            FotoPrincipal = fotoCliente;
+            FotoPrincipalId = fotoCliente.Id;
+        }
     }
 }

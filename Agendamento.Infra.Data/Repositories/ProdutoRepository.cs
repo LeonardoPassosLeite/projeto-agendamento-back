@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Agendamento.Domain.Entities;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Infra.Data.Context;
@@ -14,12 +15,19 @@ namespace Agendamento.Infra.Data.Repositories
             _produtoContext = produtoContext;
         }
 
-        public override async Task<Produto?> GetByIdAsync(int id)
+        public override async Task<Produto?> GetByIdAsync(int id, params Expression<Func<Produto, object>>[] includeProperties)
         {
-            return await _produtoContext.Produtos
-                    .Include(p => p.FotoPrincipal)
-                    .Include(p => p.Categoria)
-                    .FirstOrDefaultAsync(p => p.Id == id);
+            IQueryable<Produto> query = _produtoContext.Produtos;
+
+            query = query.Include(p => p.Categoria)
+                         .Include(p => p.FotoPrincipal);
+
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task DisableAsync(Produto produto)

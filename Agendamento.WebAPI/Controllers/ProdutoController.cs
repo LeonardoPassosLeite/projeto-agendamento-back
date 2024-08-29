@@ -6,33 +6,22 @@ namespace Agendamento.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProdutoController : GenericController<IProdutoService, ProdutoFotoDTO>
+    public class ProdutoController : CustomController<IProdutoService, ProdutoDTO, ProdutoFotoDTO>
     {
-        private readonly IProdutoService _produtoService;
-
         public ProdutoController(IProdutoService produtoService) : base(produtoService)
-        {
-            _produtoService = produtoService;
-        }
-
-        [HttpPost("add")]
-        public async Task<ActionResult<ProdutoFotoDTO>> AddProduto([FromBody] ProdutoDTO dto)
-        {
-            var result = await _produtoService.AddCustomAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
+        { }
 
         [HttpPut("{id}/status")]
         public async Task<ActionResult> UpdateStatusProduto(int id, [FromQuery] bool isActive)
         {
-            await _produtoService.UpdateStatusProdutoAsync(id, isActive);
+            await _customService.UpdateStatusProdutoAsync(id, isActive);
             return NoContent();
         }
 
         [HttpGet("categoria/{categoriaId}")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosByCategoriaId(int categoriaId)
         {
-            var produtos = await _produtoService.GetProdutosByCategoriaIdAsync(categoriaId);
+            var produtos = await _customService.GetProdutosByCategoriaIdAsync(categoriaId);
             return Ok(produtos);
         }
     }

@@ -6,7 +6,7 @@ namespace Agendamento.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriaController : CustomAddController<ICategoriaService, CategoriaDTO>
+    public class CategoriaController : GenericController<ICategoriaService, CategoriaDTO>
     {
         public CategoriaController(ICategoriaService categoriaService) : base(categoriaService)
         { }
