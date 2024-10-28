@@ -5,7 +5,12 @@ namespace Agendamento.Domain.Entities
     public sealed class Produto : SimpleEntity
     {
         public decimal Preco { get; set; }
+        public string Marca { get; set; }
+        public string Localidade { get; set; }
         public string? Descricao { get; set; }
+        public int Ano { get; set; }
+        public int Quilometragem { get; set; }
+
         public int? FotoPrincipalId { get; set; }
         public FotoProduto? FotoPrincipal { get; set; }
 

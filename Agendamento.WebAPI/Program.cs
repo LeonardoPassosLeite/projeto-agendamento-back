@@ -2,16 +2,18 @@ using Agendamento.Infra.IoC;
 using Microsoft.OpenApi.Models;
 using Agendamento.WebAPI.Middleware;
 using Agendamento.WebAPI.Swagger;
+using Agendamento.WebAPI.Configurations; // Importando a configuração de CORS
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adicionar configuração de CORS
+builder.Services.AddCorsPolicy();
 
 // Carregar configuração do appsettings.json
 var configuration = builder.Configuration;
 
-// Obter o caminho do arquivo de credenciais do Google
+// Configuração do Google Cloud (deixada como estava)
 var googleCredentialsPath = configuration["Google:ApplicationCredentials"];
-
-// Definir a variável de ambiente
 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", googleCredentialsPath);
 
 // Adicionar serviços ao contêiner
@@ -46,6 +48,9 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseCors("AllowSpecificOrigins"); 
+
 app.UseAuthorization();
 
 app.MapControllers();
